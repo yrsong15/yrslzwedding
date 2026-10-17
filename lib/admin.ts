@@ -201,7 +201,8 @@ async function setResponse(input: Extract<z.infer<typeof guestUpdateSchema>, { a
   if (pErr) throw pErr;
 
   const attending = input.attending;
-  const welcome = party.invited_to_welcome ? input.attending_welcome : null;
+  // A "no" to the wedding is a "no" to welcome drinks too.
+  const welcome = party.invited_to_welcome ? (attending === false ? false : input.attending_welcome) : null;
   const answered = attending !== null || welcome !== null;
   const now = new Date().toISOString();
   const { error } = await db

@@ -86,7 +86,7 @@ export function validateAgainstParty(input: RsvpInput, party: Party): string | n
       return "Please enter your guest's first and last name.";
     }
     if (g.attending && !g.meal) return "Please choose a meal for each attending guest.";
-    if (party.invited_to_welcome && g.attending_welcome === null) {
+    if (party.invited_to_welcome && g.attending && g.attending_welcome === null) {
       return "Please let us know about welcome drinks for each guest.";
     }
   }
@@ -102,7 +102,8 @@ export async function saveRsvp(input: RsvpInput, party: Party): Promise<void> {
   for (const g of input.guests) {
     const update: Partial<Guest> = {
       attending: g.attending,
-      attending_welcome: party.invited_to_welcome ? g.attending_welcome : null,
+      // Nobody comes to welcome drinks without the wedding, so a "no" covers both.
+      attending_welcome: party.invited_to_welcome ? g.attending && g.attending_welcome : null,
       meal: g.attending ? g.meal : null,
       dietary: g.attending ? g.dietary?.trim() || null : null,
       updated_at: now,

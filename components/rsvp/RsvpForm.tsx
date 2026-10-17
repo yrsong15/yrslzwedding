@@ -57,7 +57,7 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
       if (d.attending === null) return `Please let us know if ${who} can make it.`;
       if (d.is_plus_one && d.attending && !hasName(d)) return `Please enter the first and last name of ${who}.`;
       if (d.attending && !d.meal) return `Please choose a meal for ${who}.`;
-      if (party.invited_to_welcome && d.attending_welcome === null)
+      if (party.invited_to_welcome && d.attending && d.attending_welcome === null)
         return `Please let us know if ${who} will join us for welcome drinks.`;
     }
     return null;
@@ -78,7 +78,8 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
           guests: drafts.map((d) => ({
             id: d.id,
             attending: d.attending,
-            attending_welcome: party.invited_to_welcome ? d.attending_welcome : null,
+            // Only someone coming to the wedding is asked about welcome drinks.
+            attending_welcome: party.invited_to_welcome ? (d.attending ? d.attending_welcome : false) : null,
             meal: d.attending ? d.meal : null,
             dietary: d.attending ? d.dietary : null,
             ...(d.is_plus_one && { first_name: d.first_name, last_name: d.last_name }),
@@ -146,6 +147,15 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden"
               >
+                {party.invited_to_welcome && (
+                  <Choice
+                    label={`${welcome.title} · Friday, July 23 at ${welcome.place}`}
+                    value={d.attending_welcome}
+                    yes="I'll be there"
+                    no="Can't make it"
+                    onChange={(v) => update(d.id, { attending_welcome: v })}
+                  />
+                )}
                 <div className="space-y-5 pt-5">
                   <div>
                     <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted">Dinner</p>
@@ -187,16 +197,6 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
               </motion.div>
             )}
           </AnimatePresence>
-
-          {party.invited_to_welcome && (
-            <Choice
-              label={`${welcome.title} · Friday, July 23 at ${welcome.place}`}
-              value={d.attending_welcome}
-              yes="I'll be there"
-              no="Can't make it"
-              onChange={(v) => update(d.id, { attending_welcome: v })}
-            />
-          )}
         </motion.fieldset>
       ))}
 

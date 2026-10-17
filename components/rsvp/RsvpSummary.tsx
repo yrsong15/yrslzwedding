@@ -80,7 +80,7 @@ export default function RsvpSummary({
                 )}
               </dl>
             )}
-            {party.invited_to_welcome && (
+            {party.invited_to_welcome && g.attending && (
               <p className="mt-1 text-sm text-muted">
                 Welcome drinks: <span className="text-ink">{g.attending_welcome ? "Yes" : "No"}</span>
               </p>

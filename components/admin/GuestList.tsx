@@ -80,7 +80,7 @@ function applyChange(parties: AdminParty[], c: Change): AdminParty[] {
             ? {
                 ...g,
                 attending,
-                attending_welcome: p.invited_to_welcome ? attending_welcome : null,
+                attending_welcome: p.invited_to_welcome ? (attending === false ? false : attending_welcome) : null,
                 meal: attending ? meal : null,
                 dietary: attending ? dietary?.trim() || null : null,
               }
@@ -671,15 +671,23 @@ function ResponseCells({
   // Meal and dietary only apply to someone who's coming, as on the RSVP form.
   const coming = d.attending === true;
   const keys = (e: React.KeyboardEvent) => e.key === "Escape" && onCancel();
-  const answerSelect = (label: string, value: boolean | null, set: (v: boolean | null) => void, autoFocus = false) => (
+  // A "no" to the wedding fixes welcome drinks at "no", as on the RSVP form.
+  const declined = d.attending === false;
+  const answerSelect = (
+    label: string,
+    value: boolean | null,
+    set: (v: boolean | null) => void,
+    { autoFocus = false, disabled = false } = {},
+  ) => (
     <select
       form={formId}
       aria-label={`${label} for ${who}`}
       autoFocus={autoFocus}
+      disabled={disabled}
       value={answer(value)}
       onChange={(e) => set(fromAnswer(e.target.value))}
       onKeyDown={keys}
-      className={select}
+      className={`${select} disabled:opacity-40`}
     >
       <option value="pending">pending</option>
       <option value="yes">yes</option>
@@ -689,10 +697,17 @@ function ResponseCells({
 
   return (
     <>
-      <td className="px-4 py-2">{answerSelect("Wedding", d.attending, (attending) => onChange({ attending }), true)}</td>
+      <td className="px-4 py-2">
+        {answerSelect("Wedding", d.attending, (attending) => onChange({ attending }), { autoFocus: true })}
+      </td>
       <td className="px-4 py-2">
         {welcome ? (
-          answerSelect("Welcome drinks", d.attending_welcome, (attending_welcome) => onChange({ attending_welcome }))
+          answerSelect(
+            "Welcome drinks",
+            declined ? false : d.attending_welcome,
+            (attending_welcome) => onChange({ attending_welcome }),
+            { disabled: declined },
+          )
         ) : (
           <Badge v="not invited" />
         )}

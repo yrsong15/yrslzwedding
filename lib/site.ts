@@ -5,6 +5,12 @@ export const couple = {
   contactEmail: "hello@example.com",
 };
 
+// Whose guest an invite is. Admin only: guests never see which side they're on.
+export const sides = [
+  { value: "lauren", label: "Lauren" },
+  { value: "young_re", label: "Young Re" },
+] as const;
+
 export const weddingDate = new Date("2027-07-24T17:00:00-07:00");
 
 export const weddingDateLabel = "Saturday, July 24, 2027";

@@ -1,8 +1,13 @@
 // Import a guest list CSV into Supabase.
 //   npm run import-guests -- guests.csv
-// CSV columns: party_name,first_name,last_name,is_plus_one[,invited_to_welcome]
+// CSV columns: party_name,first_name,last_name,is_plus_one[,invited_to_welcome][,invited][,side]
+// From Google Sheets: File → Download → Comma-separated values, with those headers.
 // Rows sharing a party_name become one party. Parties whose name already
 // exists are skipped, so re-running after adding rows only imports new parties.
+// `invited` is per person; blank or missing means not invited (they can't RSVP
+// until it's switched on in /admin). invited_to_welcome defaults to yes.
+// `side` is whose guest the party is: "Lauren" or "Young Re" (blank = not set
+// yet). It only needs to be on one row of the party, and can't disagree.
 
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
@@ -41,6 +46,17 @@ function parseCsv(text: string): string[][] {
 
 const truthy = (s: string | undefined) => /^(true|yes|y|1)$/i.test((s ?? "").trim());
 
+type Side = "lauren" | "young_re";
+
+/** "Lauren" / "Young Re" (any case or spacing) → side; blank → null. */
+function parseSide(s: string | undefined, party: string): Side | null {
+  const v = (s ?? "").toLowerCase().replace(/[\s_'’-]/g, "");
+  if (!v) return null;
+  if (v === "lauren" || v === "laurens") return "lauren";
+  if (v === "youngre" || v === "youngres") return "young_re";
+  throw new Error(`${party}: side must be "Lauren" or "Young Re", not "${s}"`);
+}
+
 async function main() {
   const file = process.argv[2];
   if (!file) throw new Error("Usage: npm run import-guests -- <path/to/guests.csv>");
@@ -50,23 +66,33 @@ async function main() {
   const db = createClient(url, key, { auth: { persistSession: false } });
 
   const [header, ...data] = parseCsv(readFileSync(file, "utf8").replace(/^﻿/, ""));
+  const optional = ["invited_to_welcome", "invited", "side"];
   const col = (name: string) => {
     const i = header.map((h) => h.trim().toLowerCase()).indexOf(name);
-    if (i === -1 && name !== "invited_to_welcome") throw new Error(`Missing column: ${name}`);
+    if (i === -1 && !optional.includes(name)) throw new Error(`Missing column: ${name}`);
     return i;
   };
-  const [pi, fi, li, plusi, wi] = ["party_name", "first_name", "last_name", "is_plus_one", "invited_to_welcome"].map(col);
+  const [pi, fi, li, plusi, wi, ii, si] = ["party_name", "first_name", "last_name", "is_plus_one", ...optional].map(col);
 
-  const parties = new Map<string, { welcome: boolean; guests: { first_name: string; last_name: string; is_plus_one: boolean }[] }>();
+  type Row = { first_name: string; last_name: string; is_plus_one: boolean; invited: boolean };
+  const parties = new Map<string, { welcome: boolean; side: Side | null; guests: Row[] }>();
   for (const r of data) {
     const name = r[pi]?.trim();
     if (!name) continue;
-    const p = parties.get(name) ?? { welcome: wi === -1 || r[wi]?.trim() === "" ? true : truthy(r[wi]), guests: [] };
+    const p = parties.get(name) ?? {
+      welcome: wi === -1 || r[wi]?.trim() === "" ? true : truthy(r[wi]),
+      side: null,
+      guests: [],
+    };
+    const side = si === -1 ? null : parseSide(r[si], name);
+    if (side && p.side && side !== p.side) throw new Error(`${name}: rows disagree on side`);
+    p.side ??= side;
     const plus = truthy(r[plusi]);
     p.guests.push({
       first_name: plus ? "" : (r[fi] ?? "").trim(),
       last_name: plus ? "" : (r[li] ?? "").trim(),
       is_plus_one: plus,
+      invited: ii !== -1 && truthy(r[ii]),
     });
     parties.set(name, p);
   }
@@ -83,13 +109,15 @@ async function main() {
     }
     const { data: row, error: pErr } = await db
       .from("parties")
-      .insert({ name, invited_to_welcome: p.welcome })
+      .insert({ name, invited_to_welcome: p.welcome, side: p.side })
       .select("id")
       .single();
     if (pErr) throw pErr;
     const { error: gErr } = await db.from("guests").insert(p.guests.map((g) => ({ ...g, party_id: row.id })));
     if (gErr) throw gErr;
-    console.log(`add   ${name} (${p.guests.length} guest${p.guests.length === 1 ? "" : "s"})`);
+    const invited = p.guests.filter((g) => g.invited).length;
+    const side = p.side === "lauren" ? "Lauren's" : p.side === "young_re" ? "Young Re's" : "side not set";
+    console.log(`add   ${name} (${p.guests.length} guest${p.guests.length === 1 ? "" : "s"}, ${invited} invited, ${side})`);
     created++;
   }
   console.log(`\nDone: ${created} new part${created === 1 ? "y" : "ies"}.`);

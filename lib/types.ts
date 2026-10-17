@@ -20,3 +20,12 @@ export type Party = {
   responded_at: string | null;
   guests: Guest[];
 };
+
+// Admin-only shapes. `invited` and `side` are deliberately missing from the
+// public Guest and Party above: guest-facing code must never send them.
+export type AdminGuest = Guest & { invited: boolean };
+
+/** Whose guest an invite is. */
+export type Side = "lauren" | "young_re";
+
+export type AdminParty = Omit<Party, "guests"> & { side: Side | null; guests: AdminGuest[] };

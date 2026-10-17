@@ -1,7 +1,9 @@
 import AdminLogin from "@/components/AdminLogin";
+import GuestList from "@/components/admin/GuestList";
 import PageHeader from "@/components/PageHeader";
-import { getSummary, isAdmin, type SummaryRow } from "@/lib/admin";
-import { mealOptions } from "@/lib/site";
+import { getGuestList, isAdmin } from "@/lib/admin";
+import { mealOptions, sides } from "@/lib/site";
+import type { AdminParty, Side } from "@/lib/types";
 
 export const metadata = { title: "Admin" };
 export const dynamic = "force-dynamic";
@@ -16,49 +18,95 @@ export default async function AdminPage() {
     );
   }
 
-  let rows: SummaryRow[];
+  let parties: AdminParty[];
   try {
-    rows = await getSummary();
+    parties = await getGuestList();
   } catch (e) {
     console.error(e);
     return (
       <div className="pb-24">
-        <PageHeader title="Admin" intro="Couldn't load RSVPs. Check your Supabase env vars and that schema.sql has been run." />
+        <PageHeader title="Admin" intro="Couldn't load the guest list. Check your Supabase env vars and that schema.sql has been run." />
       </div>
     );
   }
 
+  // All counts cover invited guests only.
+  const invited = parties.flatMap((p) => p.guests.filter((g) => g.invited).map((g) => ({ ...g, party: p })));
   // Unnamed plus-ones that were never claimed aren't real guests yet.
-  const real = rows.filter((r) => !(r.is_plus_one && r.attending !== "yes"));
-  const count = (pred: (r: SummaryRow) => boolean) => real.filter(pred).length;
-  const attending = real.filter((r) => r.attending === "yes");
-  const parties = new Set(rows.map((r) => r.party));
-  const respondedParties = new Set(rows.filter((r) => r.responded_at).map((r) => r.party));
+  const real = invited.filter((r) => !(r.is_plus_one && r.attending !== true));
+  const count = (pred: (r: (typeof real)[number]) => boolean) => real.filter(pred).length;
+  const attending = real.filter((r) => r.attending === true);
+  const invitedParties = parties.filter((p) => p.guests.some((g) => g.invited));
+  const respondedParties = invitedParties.filter((p) => p.responded_at);
+  const plusOnes = invited.filter((r) => r.is_plus_one).length;
 
   const stats = [
+    {
+      label: "Invited",
+      value: invited.length,
+      note: plusOnes > 0 ? `incl. ${plusOnes} plus-one${plusOnes === 1 ? "" : "s"}` : null,
+    },
     { label: "Attending", value: attending.length },
-    { label: "Declined", value: count((r) => r.attending === "no") },
-    { label: "Pending", value: count((r) => r.attending === "pending") },
-    { label: "Parties responded", value: `${respondedParties.size} / ${parties.size}` },
-    { label: "Welcome drinks", value: count((r) => r.welcome_drinks === "yes") },
+    { label: "Declined", value: count((r) => r.attending === false) },
+    { label: "Pending", value: count((r) => r.attending === null) },
+    { label: "Parties responded", value: `${respondedParties.length} / ${invitedParties.length}` },
+    { label: "Welcome drinks", value: count((r) => r.party.invited_to_welcome && r.attending_welcome === true) },
   ];
   const meals = mealOptions.map((m) => ({ ...m, n: attending.filter((r) => r.meal === m.value).length }));
   const dietary = attending.filter((r) => r.dietary);
+
+  // Whose guests: a row per side, plus invites with no side yet (only if there
+  // are any), so the rows always add up to the total.
+  const sideRow = (label: string, side: Side | null) => {
+    const mine = invited.filter((r) => r.party.side === side);
+    return { label, invited: mine.length, attending: mine.filter((r) => r.attending === true).length };
+  };
+  const unset = sideRow("Not set yet", null);
+  const bySide = [...sides.map((s) => sideRow(`${s.label}'s`, s.value)), ...(unset.invited > 0 ? [unset] : [])];
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-24">
       <PageHeader title="RSVP Dashboard" />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-ink/10 bg-white/60 p-5 text-center">
             <p className="font-serif text-4xl text-plum">{s.value}</p>
             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted">{s.label}</p>
+            {s.note && <p className="mt-1 text-xs text-muted">{s.note}</p>}
           </div>
         ))}
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="rounded-2xl border border-ink/10 bg-white/60 p-6">
+          <h2 className="font-serif text-2xl text-plum">Whose guests</h2>
+          <table className="mt-3 w-full">
+            <thead className="text-xs uppercase tracking-[0.15em] text-muted">
+              <tr>
+                <th className="text-left font-normal">
+                  <span className="sr-only">Guests of</span>
+                </th>
+                <th className="pb-1 text-right font-normal">Invited</th>
+                <th className="pb-1 pl-4 text-right font-normal">Attending</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bySide.map((r) => (
+                <tr key={r.label}>
+                  <td className="py-0.5">{r.label}</td>
+                  <td className="text-right font-medium tabular-nums">{r.invited}</td>
+                  <td className="text-right font-medium tabular-nums">{r.attending}</td>
+                </tr>
+              ))}
+              <tr className="border-t border-ink/10">
+                <td className="pt-1.5 font-medium">Total</td>
+                <td className="pt-1.5 text-right font-medium tabular-nums">{invited.length}</td>
+                <td className="pt-1.5 text-right font-medium tabular-nums">{attending.length}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
         <section className="rounded-2xl border border-ink/10 bg-white/60 p-6">
           <h2 className="font-serif text-2xl text-plum">Meals</h2>
           <ul className="mt-3 space-y-1">
@@ -77,7 +125,7 @@ export default async function AdminPage() {
           ) : (
             <ul className="mt-3 space-y-1">
               {dietary.map((r) => (
-                <li key={`${r.party}-${r.first_name}-${r.last_name}`}>
+                <li key={r.id}>
                   <span className="font-medium">
                     {r.first_name} {r.last_name}:
                   </span>{" "}
@@ -89,55 +137,7 @@ export default async function AdminPage() {
         </section>
       </div>
 
-      <div className="mt-10 flex items-center justify-between">
-        <h2 className="font-serif text-3xl text-plum">All guests</h2>
-        <a
-          href="/api/admin/export"
-          className="rounded-full bg-plum px-6 py-2.5 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-ink"
-        >
-          Download CSV
-        </a>
-      </div>
-      <div className="mt-4 overflow-x-auto rounded-2xl border border-ink/10 bg-white/60">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-ink/10 text-xs uppercase tracking-[0.15em] text-muted">
-            <tr>
-              {["Party", "Name", "Wedding", "Welcome", "Meal", "Dietary", "Responded"].map((h) => (
-                <th key={h} className="whitespace-nowrap px-4 py-3 font-normal">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-ink/5">
-            {rows.map((r, i) => (
-              <tr key={i}>
-                <td className="px-4 py-2.5">{r.party}</td>
-                <td className="px-4 py-2.5">
-                  {r.is_plus_one && !r.first_name ? <span className="text-muted">(plus-one)</span> : `${r.first_name} ${r.last_name}`}
-                </td>
-                <td className="px-4 py-2.5">
-                  <Badge v={r.attending} />
-                </td>
-                <td className="px-4 py-2.5">
-                  <Badge v={r.welcome_drinks} />
-                </td>
-                <td className="px-4 py-2.5">{r.meal ?? ""}</td>
-                <td className="px-4 py-2.5">{r.dietary ?? ""}</td>
-                <td className="whitespace-nowrap px-4 py-2.5 text-muted">
-                  {r.responded_at ? new Date(r.responded_at).toLocaleDateString() : ""}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <GuestList parties={parties} />
     </div>
   );
-}
-
-function Badge({ v }: { v: string }) {
-  const style =
-    v === "yes" ? "bg-lavender/20 text-plum" : v === "no" ? "bg-peach/40 text-orange-dark" : "bg-ink/5 text-muted";
-  return <span className={`rounded-full px-2.5 py-0.5 text-xs ${style}`}>{v}</span>;
 }

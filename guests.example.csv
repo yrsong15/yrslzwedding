@@ -1,6 +1,6 @@
-party_name,first_name,last_name,is_plus_one,invited_to_welcome
-The Smith Family,Jane,Smith,false,true
-The Smith Family,John,Smith,false,true
-Alex Kim & Guest,Alex,Kim,false,true
-Alex Kim & Guest,,,true,true
-Pat Rivera,Pat,Rivera,false,false
+party_name,first_name,last_name,is_plus_one,invited_to_welcome,invited,side
+The Smith Family,Jane,Smith,false,true,true,Lauren
+The Smith Family,John,Smith,false,true,true,Lauren
+Alex Kim & Guest,Alex,Kim,false,true,true,Young Re
+Alex Kim & Guest,,,true,true,true,Young Re
+Pat Rivera,Pat,Rivera,false,false,true,Lauren

@@ -9,6 +9,11 @@ import RsvpSummary from "./RsvpSummary";
 
 type Step = { kind: "lookup" } | { kind: "choose"; parties: Party[] } | { kind: "form"; party: Party } | { kind: "done"; party: Party };
 
+// Show the summary only if everyone has answered. Someone invited after the
+// party responded hasn't, so the party goes back to the form.
+const stepFor = (p: Party): Step =>
+  p.responded_at && p.guests.every((g) => g.attending !== null) ? { kind: "done", party: p } : { kind: "form", party: p };
+
 const slide = {
   initial: { opacity: 0, y: 16 },
   animate: { opacity: 1, y: 0 },
@@ -25,10 +30,8 @@ export default function RsvpFlow() {
         <motion.div key="lookup" {...slide}>
           <Lookup
             onFound={(parties) => {
-              if (parties.length === 1) {
-                const p = parties[0];
-                setStep(p.responded_at ? { kind: "done", party: p } : { kind: "form", party: p });
-              } else setStep({ kind: "choose", parties });
+              if (parties.length === 1) setStep(stepFor(parties[0]));
+              else setStep({ kind: "choose", parties });
             }}
           />
         </motion.div>
@@ -40,7 +43,7 @@ export default function RsvpFlow() {
           {step.parties.map((p) => (
             <button
               key={p.id}
-              onClick={() => setStep(p.responded_at ? { kind: "done", party: p } : { kind: "form", party: p })}
+              onClick={() => setStep(stepFor(p))}
               className="block w-full rounded-2xl border border-ink/10 bg-white/60 p-5 text-left transition hover:border-lavender"
             >
               <p className="font-serif text-2xl text-plum">{p.name}</p>

@@ -3,49 +3,56 @@ import { z } from "zod";
 import { mealOptions } from "./site";
 import { supabase, type Guest, type Party } from "./supabase";
 
-const PARTY_SELECT = "id, name, invited_to_welcome, responded_at, guests(*)";
+// Guest-facing queries list columns explicitly so the admin-only columns
+// (guests.invited, parties.side, the position columns) never leave the server.
+// Embedded guests are filtered to invited ones and kept in the couple's order.
+const PUBLIC_GUEST_COLUMNS =
+  "id, party_id, first_name, last_name, is_plus_one, attending, attending_welcome, meal, dietary, updated_at";
+const PARTY_SELECT = `id, name, invited_to_welcome, responded_at, guests(${PUBLIC_GUEST_COLUMNS})`;
 
-function sortGuests(p: Party): Party {
-  // Named guests first, plus-ones last, stable by name.
-  p.guests.sort(
-    (a, b) =>
-      Number(a.is_plus_one) - Number(b.is_plus_one) ||
-      a.last_name.localeCompare(b.last_name) ||
-      a.first_name.localeCompare(b.first_name),
-  );
-  return p;
-}
-
+/** The party with only its invited guests, or null if nobody in it is invited. */
 export async function getParty(id: string): Promise<Party | null> {
-  const { data, error } = await supabase().from("parties").select(PARTY_SELECT).eq("id", id).maybeSingle();
+  const { data, error } = await supabase()
+    .from("parties")
+    .select(PARTY_SELECT)
+    .eq("id", id)
+    .eq("guests.invited", true)
+    .order("position", { referencedTable: "guests" })
+    .maybeSingle();
   if (error) throw error;
-  return data ? sortGuests(data as Party) : null;
+  const party = data as Party | null;
+  return party && party.guests.length > 0 ? party : null;
 }
 
-// Escape LIKE wildcards so the match is exact (but case-insensitive).
-const likeExact = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`);
+// Case- and spacing-insensitive, so "young re  song" matches "Young Re Song".
+const normName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
 
-/** Find parties containing a guest whose full name matches "First Last". */
+/** Find parties containing an invited guest whose full name matches what was typed. */
 export async function findPartiesByName(fullName: string): Promise<Party[]> {
-  const parts = fullName.trim().split(/\s+/);
-  if (parts.length < 2) return [];
-  const first = parts[0];
-  const last = parts.slice(1).join(" ");
+  const target = normName(fullName);
+  if (!target.includes(" ")) return [];
 
+  // Compare whole names instead of splitting the input at a space, since first
+  // and last names can both contain spaces. A guest list is small enough to scan.
   const { data, error } = await supabase()
     .from("guests")
-    .select("party_id")
+    .select("party_id, first_name, last_name")
     .eq("is_plus_one", false)
-    .ilike("first_name", likeExact(first))
-    .ilike("last_name", likeExact(last));
+    .eq("invited", true);
   if (error) throw error;
 
-  const ids = [...new Set((data ?? []).map((g) => g.party_id as string))];
+  const matches = (data ?? []).filter((g) => normName(`${g.first_name} ${g.last_name}`) === target);
+  const ids = [...new Set(matches.map((g) => g.party_id as string))];
   if (ids.length === 0) return [];
 
-  const { data: parties, error: pErr } = await supabase().from("parties").select(PARTY_SELECT).in("id", ids);
+  const { data: parties, error: pErr } = await supabase()
+    .from("parties")
+    .select(PARTY_SELECT)
+    .in("id", ids)
+    .eq("guests.invited", true)
+    .order("position", { referencedTable: "guests" });
   if (pErr) throw pErr;
-  return (parties as Party[]).map(sortGuests);
+  return parties as Party[];
 }
 
 const mealValues = mealOptions.map((m) => m.value) as [string, ...string[]];
@@ -114,15 +121,12 @@ export async function saveRsvp(input: RsvpInput, party: Party): Promise<void> {
 
 export async function clearRsvp(party: Party): Promise<void> {
   const db = supabase();
+  // Only the guests this party can see (the invited ones). Plus-one names are
+  // kept, so a name the couple (or the party) entered survives starting over.
+  const ids = party.guests.map((g) => g.id);
   const reset: Partial<Guest> = { attending: null, attending_welcome: null, meal: null, dietary: null, updated_at: null };
-  const { error } = await db.from("guests").update(reset).eq("party_id", party.id);
+  const { error } = await db.from("guests").update(reset).in("id", ids).eq("party_id", party.id);
   if (error) throw error;
-  const { error: plusErr } = await db
-    .from("guests")
-    .update({ first_name: "", last_name: "" })
-    .eq("party_id", party.id)
-    .eq("is_plus_one", true);
-  if (plusErr) throw plusErr;
   const { error: pErr } = await db.from("parties").update({ responded_at: null }).eq("id", party.id);
   if (pErr) throw pErr;
 }

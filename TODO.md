@@ -19,7 +19,7 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 
 ## Security
 
-- [ ] **Set a real `ADMIN_PASSWORD`** in `.env.local` (currently `change-me`).
+- [x] **Set a real `ADMIN_PASSWORD`** in `.env.local`. Save it in your password manager, and enter the same value in Vercel when you deploy.
 - [ ] **Decide on the guest password.** It's `nyc` now; whatever you choose goes on the invitations.
 
 ## Launch

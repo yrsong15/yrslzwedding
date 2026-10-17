@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#eba046"/>
-  <g transform="translate(32 32) scale(0.98) translate(-30 -24.5)" fill="none" stroke="#4a3c69" stroke-width="5.8" stroke-linecap="butt" stroke-linejoin="miter">
-    <path d="M30 46.5V30C30 18 24 11 10 11M30 30C30 18 36 11 50 11"/>
-    <path d="M15.5 4.5L8 11l7.5 6.5"/>
-    <path d="M44.5 4.5L52 11l-7.5 6.5"/>
+  <!-- The mood board's lilac/peach/orange arch backdrop on a plum tile. -->
+  <defs><clipPath id="tile"><rect width="64" height="64" rx="14"/></clipPath></defs>
+  <g clip-path="url(#tile)">
+    <rect width="64" height="64" fill="#4a3e5d"/>
+    <path fill="#e9beaa" d="M7 64V31a11 11 0 0 1 22 0v33Z"/>
+    <path fill="#eaa95b" d="M35 64V21a11 11 0 0 1 22 0v43Z"/>
+    <path fill="#c9c0cf" d="M10 64a22 22 0 0 1 44 0H43a11 11 0 0 0-22 0Z"/>
   </g>
 </svg>

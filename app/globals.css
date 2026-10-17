@@ -1,20 +1,22 @@
 @import "tailwindcss";
 
 /* "Lilac + peach" mood board: lilac primary, peach secondary, orange accent.
-   Contrast-checked: ink/muted/plum on cream and linen pass AA; orange-dark
-   passes AA as text on cream/linen and with cream text on it; plum on orange
-   is 4.5:1 (button text); lavender passes 3:1 as small-label text. orange and
-   peach are fill colors, too light for text on cream. */
+   lilac, peach and orange are the board's three swatches, used as fills.
+   Contrast-checked: ink/muted/plum on cream, linen and blush pass AA;
+   orange-dark passes AA as text on all three and with cream text on it; plum
+   on orange is 4.8:1 (button text); lavender passes 3:1 as small-label text. */
 @theme {
-  --color-cream: #fcf8f2; /* page background (warm ivory) */
-  --color-linen: #f1ecf6; /* alternate sections (lilac mist) */
-  --color-lavender: #8574ad; /* lilac: labels, timeline dots, focus rings, soft tints */
-  --color-plum: #4a3c69; /* deep lilac: headings, dark buttons and cards */
-  --color-peach: #f2c1a6; /* secondary: soft fills and decorative numerals */
-  --color-orange: #eba046; /* accent fill: primary buttons, dividers, nav underline */
-  --color-orange-dark: #9e5512; /* accent text (links, errors) and orange hover */
-  --color-ink: #2e2838; /* body text */
-  --color-muted: #6a6276; /* secondary text */
+  --color-cream: #fcf8f3; /* page background (warm ivory) */
+  --color-linen: #f2eef4; /* alternate sections (lilac mist) */
+  --color-blush: #f8e7de; /* peach surface: footer */
+  --color-lilac: #c9c0cf; /* primary swatch: fills, glows, favicon */
+  --color-lavender: #837796; /* lilac text: labels, timeline dots, focus rings */
+  --color-plum: #4a3e5d; /* deep lilac: headings, dark buttons and cards */
+  --color-peach: #e9beaa; /* secondary swatch: glows, numerals, favicon */
+  --color-orange: #eaa95b; /* accent swatch: primary buttons, dividers, nav underline */
+  --color-orange-dark: #99561a; /* accent text (links, errors) and orange hover */
+  --color-ink: #2f2a36; /* body text */
+  --color-muted: #6b6372; /* secondary text */
 }
 
 /* inline: next/font sets these vars on <body>, so they must resolve at use
@@ -35,5 +37,5 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-lavender) 35%, transparent);
+  background: color-mix(in srgb, var(--color-peach) 55%, transparent);
 }

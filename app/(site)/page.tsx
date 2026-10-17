@@ -8,8 +8,8 @@ export default function Home() {
     <>
       <section className="relative overflow-hidden px-4 pb-20 pt-20 text-center sm:pt-28">
         {/* soft decorative blobs */}
-        <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-lavender/20 blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-peach/40 blur-3xl" />
+        <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-lilac/40 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-peach/60 blur-3xl" />
 
         <FadeIn>
           <p lang="ko" className="font-korean text-lg text-lavender [word-break:keep-all] sm:text-xl">

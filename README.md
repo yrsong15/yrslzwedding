@@ -20,9 +20,9 @@ Next.js (App Router) + Tailwind + Supabase, deployed on Vercel. The whole site s
 ## Local development
 
 ```bash
-npm install
-cp .env.example .env.local   # then fill in the values
-npm run dev                  # http://localhost:3000
+npm install                   # one-time installation
+cp .env.example .env.local    # then fill in the values
+npm run dev                   # http://localhost:3000
 ```
 
 ## Setting up the database

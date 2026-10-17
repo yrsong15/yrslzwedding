@@ -9,10 +9,10 @@
   --color-cream: #fcf8f3; /* page background (warm ivory) */
   --color-linen: #f2eef4; /* alternate sections (lilac mist) */
   --color-blush: #f8e7de; /* peach surface: footer */
-  --color-lilac: #c9c0cf; /* primary swatch: fills, glows, favicon */
+  --color-lilac: #c9c0cf; /* primary swatch: fills, glows */
   --color-lavender: #837796; /* lilac text: labels, timeline dots, focus rings */
   --color-plum: #4a3e5d; /* deep lilac: headings, dark buttons and cards */
-  --color-peach: #e9beaa; /* secondary swatch: glows, numerals, favicon */
+  --color-peach: #e9beaa; /* secondary swatch: glows, numerals */
   --color-orange: #eaa95b; /* accent swatch: primary buttons, dividers, nav underline */
   --color-orange-dark: #99561a; /* accent text (links, errors) and orange hover */
   --color-ink: #2f2a36; /* body text */

@@ -1,6 +1,6 @@
 # yrslzwedding
 
-Wedding website for Young Re & Lauren — July 24, 2027, Portland, OR.
+Wedding website for Lauren & Young Re — July 24, 2027, Portland, OR.
 
 **Live site: https://yrslzwedding.vercel.app**
 

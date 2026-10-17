@@ -17,7 +17,7 @@ There is no test suite. Verify by running the dev server. After changing `SITE_P
 Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
 
 - **Most content lives in `lib/site.ts`:**
-  - names, dates, the Korean Home message (`koreanMessage`)
+  - names, dates, the Korean Home message (`koreanMessage`). The couple is always written Lauren first: "Lauren & Young Re", and in Korean 로렌과 영래가 (the particles change with the order, so don't just swap the names).
   - nav labels (each with its Korean `ko` label)
   - schedule, hotel
   - Sights (`thingsToDo`) and food & drink (`foodAndDrink`)

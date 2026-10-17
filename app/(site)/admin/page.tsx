@@ -138,6 +138,6 @@ export default async function AdminPage() {
 
 function Badge({ v }: { v: string }) {
   const style =
-    v === "yes" ? "bg-lavender/20 text-plum" : v === "no" ? "bg-poppy/15 text-poppy-dark" : "bg-ink/5 text-muted";
+    v === "yes" ? "bg-lavender/20 text-plum" : v === "no" ? "bg-peach/40 text-orange-dark" : "bg-ink/5 text-muted";
   return <span className={`rounded-full px-2.5 py-0.5 text-xs ${style}`}>{v}</span>;
 }

@@ -61,7 +61,7 @@ export default function PasswordForm({
       >
         {loading ? "Checking…" : "Enter"}
       </button>
-      <p className="min-h-5 text-center text-sm text-poppy" role="alert">
+      <p className="min-h-5 text-center text-sm text-orange-dark" role="alert">
         {error}
       </p>
     </motion.form>

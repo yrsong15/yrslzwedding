@@ -1,17 +1,20 @@
 @import "tailwindcss";
 
-/* "Orange and violet wildflowers", kept muted. Contrast-checked: ink/muted/plum
-   on cream and linen pass AA; cream on poppy is 3.8:1 (fine for large/bold
-   button text), and lavender passes 3:1 as small-label text. */
+/* "Lilac + peach" mood board: lilac primary, peach secondary, orange accent.
+   Contrast-checked: ink/muted/plum on cream and linen pass AA; orange-dark
+   passes AA as text on cream/linen and with cream text on it; plum on orange
+   is 4.5:1 (button text); lavender passes 3:1 as small-label text. orange and
+   peach are fill colors, too light for text on cream. */
 @theme {
-  --color-cream: #fbf8f3; /* page background */
-  --color-linen: #f3eef4; /* alternate sections (pale lavender mist) */
-  --color-lavender: #8f80a9; /* labels, timeline dots, focus rings, soft tints */
-  --color-plum: #4d3b5e; /* headings, logo letters, dark buttons and cards */
-  --color-poppy: #c0662f; /* highlight: primary buttons, links, the logo's Y */
-  --color-poppy-dark: #9f5024; /* poppy hover */
-  --color-ink: #2d2733; /* body text */
-  --color-muted: #6a6272; /* secondary text */
+  --color-cream: #fcf8f2; /* page background (warm ivory) */
+  --color-linen: #f1ecf6; /* alternate sections (lilac mist) */
+  --color-lavender: #8574ad; /* lilac: labels, timeline dots, focus rings, soft tints */
+  --color-plum: #4a3c69; /* deep lilac: headings, dark buttons and cards */
+  --color-peach: #f2c1a6; /* secondary: soft fills and decorative numerals */
+  --color-orange: #eba046; /* accent fill: primary buttons, dividers, nav underline */
+  --color-orange-dark: #9e5512; /* accent text (links, errors) and orange hover */
+  --color-ink: #2e2838; /* body text */
+  --color-muted: #6a6276; /* secondary text */
 }
 
 /* inline: next/font sets these vars on <body>, so they must resolve at use

@@ -12,7 +12,7 @@ export default function SchedulePage() {
         {schedule.map((day) => (
           <section key={day.day}>
             <FadeIn>
-              <h2 className="mb-8 text-center text-sm uppercase tracking-[0.3em] text-poppy">{day.day}</h2>
+              <h2 className="mb-8 text-center text-sm uppercase tracking-[0.3em] text-orange-dark">{day.day}</h2>
             </FadeIn>
             <ol className="relative space-y-8 border-l border-lavender/40 pl-8">
               {day.events.map((e, i) => (
@@ -27,7 +27,7 @@ export default function SchedulePage() {
                         href={e.mapUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-poppy underline-offset-4 hover:underline"
+                        className="text-sm text-orange-dark underline-offset-4 hover:underline"
                       >
                         {e.address} ↗
                       </a>

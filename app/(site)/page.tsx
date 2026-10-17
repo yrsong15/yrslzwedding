@@ -9,7 +9,7 @@ export default function Home() {
       <section className="relative overflow-hidden px-4 pb-20 pt-20 text-center sm:pt-28">
         {/* soft decorative blobs */}
         <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-lavender/20 blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-poppy/15 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-peach/40 blur-3xl" />
 
         <FadeIn>
           <p lang="ko" className="font-korean text-lg text-lavender [word-break:keep-all] sm:text-xl">
@@ -21,7 +21,7 @@ export default function Home() {
         </FadeIn>
         <FadeIn delay={0.3}>
           <p className="mt-6 font-serif text-2xl italic text-muted">are getting married</p>
-          <div className="mx-auto my-8 h-px w-20 bg-poppy/60" />
+          <div className="mx-auto my-8 h-px w-20 bg-orange/70" />
           <p className="text-sm uppercase tracking-[0.3em] text-ink">{weddingDateLabel}</p>
           <p className="mt-2 text-sm uppercase tracking-[0.3em] text-muted">
             {venue} · {location}
@@ -33,7 +33,7 @@ export default function Home() {
         <FadeIn delay={0.6} className="mt-12 flex flex-wrap justify-center gap-4">
           <Link
             href="/rsvp"
-            className="rounded-full bg-poppy px-8 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-poppy-dark"
+            className="rounded-full bg-orange px-8 py-3 text-sm uppercase tracking-[0.2em] text-plum transition hover:bg-orange-dark hover:text-cream"
           >
             RSVP
           </Link>

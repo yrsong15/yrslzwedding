@@ -25,15 +25,15 @@ export default function Nav() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`group relative text-sm uppercase tracking-[0.15em] transition-colors hover:text-poppy ${
-                  isActive(l.href) ? "text-poppy" : "text-ink/80"
+                className={`group relative text-sm uppercase tracking-[0.15em] transition-colors hover:text-orange-dark ${
+                  isActive(l.href) ? "text-orange-dark" : "text-ink/80"
                 }`}
               >
                 <BilingualLabel en={l.label} ko={l.ko} />
                 {isActive(l.href) && (
                   <motion.span
                     layoutId="nav-underline"
-                    className="absolute -bottom-1 left-0 right-0 h-px bg-poppy"
+                    className="absolute -bottom-1 left-0 right-0 h-px bg-orange"
                   />
                 )}
               </Link>
@@ -67,7 +67,7 @@ export default function Nav() {
                   href={l.href}
                   onClick={() => setOpen(false)}
                   className={`block px-6 py-3 text-sm uppercase tracking-[0.15em] ${
-                    isActive(l.href) ? "text-poppy" : "text-ink/80"
+                    isActive(l.href) ? "text-orange-dark" : "text-ink/80"
                   }`}
                 >
                   {/* Touch screens can't hover, so the menu shows the Korean as a second line. */}

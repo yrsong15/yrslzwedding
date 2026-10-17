@@ -99,12 +99,12 @@ export default function RsvpSummary({
         <button
           onClick={clear}
           disabled={clearing}
-          className="rounded-full px-6 py-3 text-sm uppercase tracking-[0.2em] text-muted transition hover:text-poppy disabled:opacity-50"
+          className="rounded-full px-6 py-3 text-sm uppercase tracking-[0.2em] text-muted transition hover:text-orange-dark disabled:opacity-50"
         >
           {clearing ? "Clearing…" : "Clear response"}
         </button>
       </div>
-      <p className="mt-3 min-h-5 text-sm text-poppy" role="alert">
+      <p className="mt-3 min-h-5 text-sm text-orange-dark" role="alert">
         {error}
       </p>
     </div>

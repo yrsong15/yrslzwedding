@@ -77,7 +77,7 @@ export default function RsvpFlow() {
 function BackLink({ onClick, label = "← Back to search" }: { onClick: () => void; label?: string }) {
   return (
     <p className="mt-8 text-center">
-      <button onClick={onClick} className="text-sm text-muted underline-offset-4 hover:text-poppy hover:underline">
+      <button onClick={onClick} className="text-sm text-muted underline-offset-4 hover:text-orange-dark hover:underline">
         {label}
       </button>
     </p>
@@ -134,7 +134,7 @@ function Lookup({ onFound }: { onFound: (parties: Party[]) => void }) {
           {loading ? "Searching…" : "Find me"}
         </button>
       </div>
-      <p className="mt-4 min-h-6 text-center text-sm text-poppy" role="alert">
+      <p className="mt-4 min-h-6 text-center text-sm text-orange-dark" role="alert">
         {error}
       </p>
     </form>

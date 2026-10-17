@@ -28,11 +28,11 @@ export default function ThingsToDoPage() {
                 rel="noopener noreferrer"
                 className="group flex h-full flex-col rounded-2xl border border-ink/10 bg-white/60 p-6 transition hover:-translate-y-1 hover:shadow-lg"
               >
-                <span className="font-serif text-5xl text-poppy/40">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="mt-3 font-serif text-2xl text-plum group-hover:text-poppy">{t.title}</h3>
+                <span className="font-serif text-5xl text-peach">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="mt-3 font-serif text-2xl text-plum group-hover:text-orange-dark">{t.title}</h3>
                 <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted">{t.area}</p>
                 <p className="mt-4 flex-1 leading-relaxed text-muted">{t.blurb}</p>
-                <span className="mt-4 text-sm text-poppy">Learn more ↗</span>
+                <span className="mt-4 text-sm text-orange-dark">Learn more ↗</span>
               </a>
             </FadeIn>
           ))}
@@ -56,7 +56,7 @@ export default function ThingsToDoPage() {
                       href={mapsUrl(p.map)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 text-sm text-poppy underline-offset-4 hover:underline"
+                      className="mt-3 text-sm text-orange-dark underline-offset-4 hover:underline"
                     >
                       Google Maps ↗
                     </a>

@@ -37,7 +37,7 @@ export default function PasswordPage() {
         <p className="mt-4 font-serif text-xl italic text-muted">
           {weddingDateLabel} · {location}
         </p>
-        <div className="mx-auto my-8 h-px w-16 bg-poppy/60" />
+        <div className="mx-auto my-8 h-px w-16 bg-orange/70" />
         <p className="mb-6 text-sm text-muted">Please enter the password from your invitation.</p>
         <Suspense>
           <Gate />

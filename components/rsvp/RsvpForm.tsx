@@ -179,14 +179,14 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
         </motion.fieldset>
       ))}
 
-      <p className="min-h-6 text-center text-sm text-poppy" role="alert">
+      <p className="min-h-6 text-center text-sm text-orange-dark" role="alert">
         {error}
       </p>
       <div className="text-center">
         <button
           type="submit"
           disabled={saving}
-          className="rounded-full bg-poppy px-10 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-poppy-dark disabled:opacity-50"
+          className="rounded-full bg-orange px-10 py-3 text-sm uppercase tracking-[0.2em] text-plum transition hover:bg-orange-dark hover:text-cream disabled:opacity-50"
         >
           {saving ? "Sending…" : party.responded_at ? "Update RSVP" : "Send RSVP"}
         </button>

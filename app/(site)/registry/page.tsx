@@ -22,7 +22,7 @@ export default function RegistryPage() {
                 href={c.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-8 inline-block rounded-full bg-poppy px-8 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-poppy-dark"
+                className="mt-8 inline-block rounded-full bg-orange px-8 py-3 text-sm uppercase tracking-[0.2em] text-plum transition hover:bg-orange-dark hover:text-cream"
               >
                 Donate ↗
               </a>

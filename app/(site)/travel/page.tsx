@@ -49,7 +49,7 @@ export default function TravelPage() {
             href={hotel.block?.bookingUrl ?? hotel.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-8 inline-block rounded-full bg-cream px-8 py-3 text-sm uppercase tracking-[0.2em] text-plum transition hover:bg-poppy hover:text-cream"
+            className="mt-8 inline-block rounded-full bg-cream px-8 py-3 text-sm uppercase tracking-[0.2em] text-plum transition hover:bg-orange hover:text-plum"
           >
             {hotel.block ? "Book your room" : "Visit hotel website"} ↗
           </a>
@@ -65,7 +65,7 @@ export default function TravelPage() {
           {transport.map((t, i) => (
             <FadeIn key={t.title} delay={i * 0.1}>
               <div className="h-full rounded-2xl border border-ink/10 bg-white/60 p-6">
-                <h3 className="font-serif text-2xl text-poppy">{t.title}</h3>
+                <h3 className="font-serif text-2xl text-orange-dark">{t.title}</h3>
                 <p className="mt-3 leading-relaxed text-muted">{t.body}</p>
               </div>
             </FadeIn>

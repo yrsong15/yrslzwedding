@@ -48,4 +48,8 @@ Almost all copy lives in [`lib/site.ts`](lib/site.ts): names, dates, schedule, h
 
 ## Deploying
 
-Import the repo into [Vercel](https://vercel.com/new), add the environment variables above, and deploy.
+Already deployed. Every push to `main` redeploys automatically.
+
+To set it up again from scratch, import the repo into [Vercel](https://vercel.com/new), paste in your `.env.local` contents as the environment variables (the names are in [`.env.example`](.env.example)), and deploy. Skip Vercel's Supabase integration, which can replace your Supabase settings with a new, empty project.
+
+After changing an environment variable in Vercel, go to **Deployments → ⋯ → Redeploy** for it to take effect.

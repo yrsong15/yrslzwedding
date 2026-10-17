@@ -13,13 +13,14 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 
 ## Guest list & database
 
-- [ ] **Delete the test data.** Remove The Smith Family, Alex Kim & Guest, and Pat Rivera in the Supabase Table Editor (deleting a party removes its guests).
+- [ ] **Delete the test data.** Remove The Smith Family, Alex Kim & Guest, and Pat Rivera in the Supabase Table Editor (deleting a party removes its guests). They're currently findable on the live site and counted in `/admin`.
 - [ ] **Build `guests.csv`.** Use the format in `guests.example.csv`, then run `npm run import-guests -- guests.csv`.
 - [ ] **Test RSVP yourself.** Look up a real name, submit, edit, and check `/admin`.
 
 ## Security
 
 - [x] **Set a real `ADMIN_PASSWORD`** in `.env.local`. Save it in your password manager, and enter the same value in Vercel when you deploy.
+- [ ] **(Optional) Tighten RSVP privacy.** Right now anyone with the site password and a guest's full name can see and change that party's answers, including dietary notes. A second check, like an email or another party member's name, could gate that.
 - [x] **Decide on the guest password.** It's `pdx`; this goes on the invitations. If you change it in Vercel later, redeploy, and note that everyone gets logged out.
 
 ## Launch

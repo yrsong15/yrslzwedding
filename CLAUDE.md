@@ -29,11 +29,20 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
 - **RSVP API:** `lib/rsvp.ts` holds the logic (zod schema, `validateAgainstParty`, `saveRsvp`, `clearRsvp`). The route handlers in `app/api/rsvp/` are thin wrappers. `POST` overwrites the earlier answers (edits) and `DELETE` resets a party to unanswered. Validation runs both client-side (`components/rsvp/RsvpForm.tsx`) and server-side, so keep the two in sync.
 - **Meal options** are defined in `lib/site.ts` and also enforced by a `CHECK` constraint on `guests.meal`. Changing one means changing both.
 - **Animations** use framer-motion through `components/FadeIn.tsx` (scroll-triggered) and per-component `motion` elements.
-- **Theme tokens** (`cream`, `linen`, `sage`, `sage-dark`, `terracotta`, `ink`, `muted`; fonts `font-serif` = Cormorant Garamond, `font-sans` = Jost) are defined in the `@theme` block in `app/globals.css`.
+- **Theme tokens** (`cream`, `linen`, `sage`, `sage-dark`, `terracotta`, `ink`, `muted`) are in the `@theme` block in `app/globals.css`. Fonts (`font-serif` = Cormorant Garamond, `font-sans` = Jost) are in a separate `@theme inline` block. This must stay `inline`: `next/font` defines `--font-cormorant` / `--font-jost` on `<body>`, so a plain `@theme` resolves them on `:root`, where they're undefined, and every serif heading silently falls back to the sans font.
+- **Logo** (`components/Logo.tsx`): serif L and R with a hand-drawn SVG arrow-fork "Y". The SVG's left and right margins are intentionally unequal, so the *ink* gap on both sides of the Y is 0.08em (L and R have different side bearings, as the comment explains). Don't "fix" them to match. `public/logo.svg` is a standalone copy with the letters converted to outlines (no font dependency); regenerate it whenever the component changes. An alternate "L & YR" version is in `design/logo-backups/` (the `.tsx.txt` extension keeps it out of the build).
+- **Favicon:** `app/icon.svg` (cream Y on a terracotta tile), `app/favicon.ico` (16/32/48 PNGs), and `app/apple-icon.png` (180px, full-bleed). Next.js serves them automatically, and the middleware matcher lets them through without login.
+
+## Deployment & services
+
+- **Live:** https://yrslzwedding.vercel.app (Vercel project `yrslzwedding`, deployed from GitHub `yrsong15/yrslzwedding`). Every push to `main` redeploys.
+- **Env vars in Vercel** mirror `.env.local`. Changing one in Vercel takes effect only after a redeploy. Changing `SITE_PASSWORD` or `ADMIN_PASSWORD` logs everyone out of that scope, because the cookie token is derived from the password.
+- **Don't add Vercel's Supabase integration.** It can create a new project and overwrite `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`, pointing the site at an empty database.
+- **Supabase MCP** is configured in `.mcp.json` (project-scoped, not read-only). It's useful for inspecting data and running schema SQL. Destructive statements against the real guest data need the user's go-ahead.
 
 ## Repo visibility
 
 This GitHub repo is **intentionally public**. The owners have decided this is fine. Don't recommend making it private.
 
-- The guest password (`SITE_PASSWORD`, currently `pdx`, also shown in `.env.example`) is a casual gate for friends and family. It's acceptable for it to leak, so committing or mentioning it is fine.
+- The guest password (`SITE_PASSWORD`, currently `pdx`) is a casual gate for friends and family. It's acceptable for it to leak, so mentioning it is fine. (`.env.example` holds a placeholder value, not the real one.)
 - Real secrets are still never committed: `ADMIN_PASSWORD`, `SITE_SECRET`, and `SUPABASE_SERVICE_ROLE_KEY` live only in `.env.local` (gitignored) and Vercel. The guest list (`guests.csv`) is also gitignored because it holds guests' personal info. Keep both out of git.

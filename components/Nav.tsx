@@ -17,7 +17,7 @@ export default function Nav() {
     <header className="sticky top-0 z-40 border-b border-ink/10 bg-cream/85 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="/" aria-label="Home" className="transition-opacity hover:opacity-80">
-          <Logo className="text-3xl" />
+          <Logo size={64} />
         </Link>
 
         <ul className="hidden gap-6 lg:flex">

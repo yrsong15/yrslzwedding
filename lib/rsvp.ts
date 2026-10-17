@@ -85,6 +85,10 @@ export function validateAgainstParty(input: RsvpInput, party: Party): string | n
     if (existing.is_plus_one && g.attending && !(g.first_name?.trim() && g.last_name?.trim())) {
       return "Please enter your guest's first and last name.";
     }
+    // Someone on the list with only a first name gives a last name if they're coming.
+    if (!existing.is_plus_one && !existing.last_name.trim() && g.attending && !g.last_name?.trim()) {
+      return "Please enter the last name of each guest who's coming.";
+    }
     if (g.attending && !g.meal) return "Please choose a meal for each attending guest.";
     if (party.invited_to_welcome && g.attending && g.attending_welcome === null) {
       return "Please let us know about welcome drinks for each guest.";
@@ -97,7 +101,7 @@ export function validateAgainstParty(input: RsvpInput, party: Party): string | n
 export async function saveRsvp(input: RsvpInput, party: Party): Promise<void> {
   const now = new Date().toISOString();
   const db = supabase();
-  const plusOneIds = new Set(party.guests.filter((g) => g.is_plus_one).map((g) => g.id));
+  const byId = new Map(party.guests.map((g) => [g.id, g]));
 
   for (const g of input.guests) {
     const update: Partial<Guest> = {
@@ -108,9 +112,13 @@ export async function saveRsvp(input: RsvpInput, party: Party): Promise<void> {
       dietary: g.attending ? g.dietary?.trim() || null : null,
       updated_at: now,
     };
-    if (plusOneIds.has(g.id)) {
+    const existing = byId.get(g.id)!;
+    if (existing.is_plus_one) {
       update.first_name = g.attending ? (g.first_name ?? "").trim() : "";
       update.last_name = g.attending ? (g.last_name ?? "").trim() : "";
+    } else if (!existing.last_name.trim() && g.last_name?.trim()) {
+      // Fill in a missing last name, but never change a name the couple entered.
+      update.last_name = g.last_name.trim();
     }
     const { error } = await db.from("guests").update(update).eq("id", g.id).eq("party_id", party.id);
     if (error) throw error;

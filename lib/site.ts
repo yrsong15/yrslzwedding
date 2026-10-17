@@ -16,11 +16,11 @@ export const rsvpDeadline = "March 1, 2027";
 // `ko` is shown when a tab is hovered, focused, or pressed (see components/Nav.tsx).
 export const navLinks = [
   { href: "/", label: "Home", ko: "홈" },
-  { href: "/rsvp", label: "RSVP", ko: "참석 여부" },
+  { href: "/rsvp", label: "RSVP", ko: "참석" },
   { href: "/schedule", label: "Schedule", ko: "일정" },
   { href: "/things-to-do", label: "Things to Do", ko: "즐길 거리" },
   { href: "/travel", label: "Travel & Lodging", ko: "교통 · 숙소" },
-  { href: "/faq", label: "FAQs", ko: "자주 묻는 질문" },
+  { href: "/faq", label: "FAQs", ko: "궁금한 점" },
   { href: "/registry", label: "Registry", ko: "축하의 마음" },
 ];
 

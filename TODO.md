@@ -20,12 +20,12 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 ## Security
 
 - [x] **Set a real `ADMIN_PASSWORD`** in `.env.local`. Save it in your password manager, and enter the same value in Vercel when you deploy.
-- [ ] **Decide on the guest password.** It's `nyc` now; whatever you choose goes on the invitations.
+- [x] **Decide on the guest password.** It's `pdx`; this goes on the invitations. If you change it in Vercel later, redeploy, and note that everyone gets logged out.
 
 ## Launch
 
-- [ ] **Commit the code to git.** Nothing is committed yet. `.env.local` and `guests.csv` are gitignored and must stay that way.
-- [ ] **Push to a GitHub repo.** Private is recommended.
+- [x] **Commit the code to git.** `.env.local` and `guests.csv` are gitignored and must stay that way.
+- [x] **Push to GitHub.** `yrsong15/yrslzwedding`, public by choice.
 - [ ] **Deploy on Vercel.** Import the repo and add the five env vars from `.env.example` with your real values.
 - [ ] **Custom domain (optional).** Buy one and connect it in Vercel.
 - [ ] **Watch Supabase's free-tier pausing.** Free projects pause after about a week with no activity, and RSVPs fail while paused. Either upgrade, or make sure the project is unpaused before invitations go out and stays in use.

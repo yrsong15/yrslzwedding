@@ -35,5 +35,5 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
 
 This GitHub repo is **intentionally public**. The owners have decided this is fine. Don't recommend making it private.
 
-- The guest password (`SITE_PASSWORD`, currently `nyc`, also shown in `.env.example`) is a casual gate for friends and family. It's acceptable for it to leak, so committing or mentioning it is fine.
+- The guest password (`SITE_PASSWORD`, currently `pdx`, also shown in `.env.example`) is a casual gate for friends and family. It's acceptable for it to leak, so committing or mentioning it is fine.
 - Real secrets are still never committed: `ADMIN_PASSWORD`, `SITE_SECRET`, and `SUPABASE_SERVICE_ROLE_KEY` live only in `.env.local` (gitignored) and Vercel. The guest list (`guests.csv`) is also gitignored because it holds guests' personal info. Keep both out of git.

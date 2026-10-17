@@ -9,7 +9,7 @@ export const weddingDate = new Date("2027-07-24T17:00:00-07:00");
 
 export const weddingDateLabel = "Saturday, July 24, 2027";
 export const location = "Portland, Oregon";
-export const rsvpDeadline = "June 1, 2027";
+export const rsvpDeadline = "March 1, 2027";
 
 export const navLinks = [
   { href: "/", label: "Home" },

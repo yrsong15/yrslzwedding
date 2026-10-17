@@ -13,14 +13,15 @@ export const koreanMessage = "영래와 로렌이 함께 인생의 새로운 출
 export const location = "Portland, Oregon";
 export const rsvpDeadline = "March 1, 2027";
 
+// `ko` is shown when a tab is hovered, focused, or pressed (see components/Nav.tsx).
 export const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/rsvp", label: "RSVP" },
-  { href: "/schedule", label: "Schedule" },
-  { href: "/things-to-do", label: "Things to Do" },
-  { href: "/travel", label: "Travel & Lodging" },
-  { href: "/faq", label: "FAQs" },
-  { href: "/registry", label: "Registry" },
+  { href: "/", label: "Home", ko: "홈" },
+  { href: "/rsvp", label: "RSVP", ko: "참석 여부" },
+  { href: "/schedule", label: "Schedule", ko: "일정" },
+  { href: "/things-to-do", label: "Things to Do", ko: "즐길 거리" },
+  { href: "/travel", label: "Travel & Lodging", ko: "교통 · 숙소" },
+  { href: "/faq", label: "FAQs", ko: "자주 묻는 질문" },
+  { href: "/registry", label: "Registry", ko: "축하의 마음" },
 ];
 
 // Keep in sync with the CHECK constraint on guests.meal in supabase/schema.sql.

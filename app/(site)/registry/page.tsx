@@ -10,7 +10,7 @@ export default function RegistryPage() {
       <PageHeader
         eyebrow="Registry"
         title="Giving Back"
-        intro="Your presence is the greatest gift. If you'd like to honor us with something more, we'd be grateful for a donation to one of these causes close to our hearts."
+        intro="Your presence is the gift, so we will not be accepting any gifts — we wouldn't have room to store them in our NYC apartment anyway! In lieu of physical gifts, please consider donating to one of the following charities that mean a lot to us."
       />
       <div className="mx-auto grid max-w-4xl gap-6 px-4 sm:grid-cols-2">
         {charities.map((c, i) => (

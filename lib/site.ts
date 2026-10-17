@@ -155,7 +155,7 @@ export const charities = [
   {
     name: "Brooklyn Bridge Park Conservancy",
     blurb:
-      "Supporting free programs, public art, and stewardship of the waterfront park we love in New York.",
+      "Supporting free programs, public art, and stewardship of the waterfront park that we run in every single morning.",
     url: "https://brooklynbridgepark.org/support/",
   },
 ];

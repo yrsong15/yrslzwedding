@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { couple, navLinks } from "@/lib/site";
+import { navLinks } from "@/lib/site";
+import Logo from "./Logo";
 
 export default function Nav() {
   const pathname = usePathname();
@@ -15,8 +16,8 @@ export default function Nav() {
   return (
     <header className="sticky top-0 z-40 border-b border-ink/10 bg-cream/85 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="font-serif text-2xl tracking-wide text-sage-dark">
-          {couple.shortNames}
+        <Link href="/" aria-label="Home" className="transition-opacity hover:opacity-80">
+          <Logo className="text-3xl" />
         </Link>
 
         <ul className="hidden gap-6 lg:flex">

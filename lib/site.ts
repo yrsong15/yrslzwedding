@@ -2,11 +2,10 @@
 
 export const couple = {
   names: "Young Re & Lauren",
-  shortNames: "YR & L",
   contactEmail: "hello@example.com",
 };
 
-export const weddingDate = new Date("2027-07-24T16:00:00-07:00");
+export const weddingDate = new Date("2027-07-24T17:00:00-07:00");
 
 export const weddingDateLabel = "Saturday, July 24, 2027";
 export const location = "Portland, Oregon";
@@ -50,21 +49,23 @@ export const schedule = [
     day: "Saturday, July 24",
     events: [
       {
-        time: "4:00 PM",
+        time: "5:00 PM",
         title: "Ceremony",
-        place: "Venue to be announced",
+        place: "Ecotrust Building",
+        address: "721 NW 9th Ave, Portland, OR 97209",
+        mapUrl: "https://maps.google.com/?q=Ecotrust+Building+721+NW+9th+Ave+Portland+OR+97209",
         description: "Please arrive 15–20 minutes early to find your seat.",
       },
       {
-        time: "5:00 PM",
+        time: "6:00 PM",
         title: "Cocktail Hour",
-        place: "Venue to be announced",
-        description: "Drinks and hors d'oeuvres on the terrace.",
+        place: "Ecotrust Building",
+        description: "Drinks and hors d'oeuvres.",
       },
       {
-        time: "6:30 PM",
+        time: "7:30 PM",
         title: "Dinner & Dancing",
-        place: "Venue to be announced",
+        place: "Ecotrust Building",
         description: "Dinner, toasts, and dancing until late.",
       },
     ],

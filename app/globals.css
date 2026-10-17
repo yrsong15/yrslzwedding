@@ -9,7 +9,11 @@
   --color-terracotta-dark: #a5543a;
   --color-ink: #2e2a26;
   --color-muted: #6b645c;
+}
 
+/* inline: next/font sets these vars on <body>, so they must resolve at use
+   site, not on :root where they're undefined. */
+@theme inline {
   --font-serif: var(--font-cormorant);
   --font-sans: var(--font-jost);
 }

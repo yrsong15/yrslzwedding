@@ -2,7 +2,7 @@
 
 Wedding website for Lauren & Young Re — July 24, 2027, Portland, OR.
 
-**Live site: https://yrslzwedding.vercel.app**
+**Live site: https://laurenyoungre.com**
 
 Next.js (App Router) + Tailwind + Supabase, deployed on Vercel. The whole site sits behind a shared password; RSVPs are stored in Supabase.
 
@@ -10,8 +10,8 @@ Next.js (App Router) + Tailwind + Supabase, deployed on Vercel. The whole site s
 
 | What | Link |
 | --- | --- |
-| Live site | https://yrslzwedding.vercel.app |
-| RSVP dashboard (admin password) | https://yrslzwedding.vercel.app/admin |
+| Live site | https://laurenyoungre.com |
+| RSVP dashboard (admin password) | https://laurenyoungre.com/admin |
 | Vercel (deployments, env vars, domains) | https://vercel.com/dashboard → `yrslzwedding` |
 | Supabase project | https://supabase.com/dashboard/project/advualgyombhyhipussb |
 | Supabase Table Editor (guests & RSVPs) | https://supabase.com/dashboard/project/advualgyombhyhipussb/editor |

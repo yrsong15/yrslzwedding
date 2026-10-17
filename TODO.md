@@ -7,7 +7,8 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 - [ ] **Contact email.** Replace `hello@example.com` in `lib/site.ts`. It appears on the FAQ page and in the RSVP "we couldn't find your name" message.
 - [ ] **Meal options.** The three dinners in `lib/site.ts` are placeholders. If you change the option *values* (`beef` / `fish` / `vegetarian`), also update the `meal` CHECK constraint in Supabase (see `supabase/schema.sql`).
 - [ ] **FAQs.** Kids and venue parking still say "details coming soon". Review the dress code and the other answers too.
-- [ ] **Things to do.** Review the five picks and swap in your own favorites.
+- [ ] **Things to do: Sights.** The five Sights picks were researched placeholders. Review them and swap in your own favorites. The restaurant, café, and bar lists are already yours.
+- [ ] **Korean text check.** Have a native-speaking family member review the Home page message (영래와 로렌이 함께 인생의 새로운 출발을 하려 합니다) and the nav tab labels, including the 영래 spelling.
 - [ ] **Hotel room block (optional).** If you reserve one, fill in `hotel.block` in `lib/site.ts`; the Travel page switches to showing the code and deadline.
 - [ ] **Look over every page** on your phone and on a laptop.
 
@@ -35,4 +36,8 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 
 - [ ] **Switch the Supabase MCP to read-only** (or disconnect it) once real RSVPs arrive.
 - [ ] **(Optional) Auto-close RSVPs** after March 1, 2027, with a "please email us" message.
-- [ ] **Recheck time-sensitive details** closer to July 2027: hotel valet price, Wayfinder Beer hours, the Multnomah Falls permit rules.
+- [ ] **Recheck time-sensitive details** closer to July 2027:
+  - hotel valet price
+  - Wayfinder Beer and Backwoods Brewing hours
+  - the Multnomah Falls permit rules
+  - that every recommended restaurant, café, and bar is still open (Javelina already moved once)

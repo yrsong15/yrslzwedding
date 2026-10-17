@@ -44,7 +44,15 @@ Build your guest list as `guests.csv` (see [`guests.example.csv`](guests.example
 
 ## Editing content
 
-Almost all copy lives in [`lib/site.ts`](lib/site.ts): names, dates, schedule, hotel, things to do, FAQs, registry links, and meal options. If you change meal options, update the `CHECK` constraint on `guests.meal` in Supabase as well.
+Almost all copy lives in [`lib/site.ts`](lib/site.ts):
+- names, dates, schedule, hotel
+- sights, plus restaurant, café, and bar recommendations
+- FAQs, registry links, meal options
+- the Korean text: the Home page message and each nav tab's Korean label
+
+Page intros (like the Registry's no-gifts note) are in each page's file under `app/(site)/`.
+
+If you change meal options, update the `CHECK` constraint on `guests.meal` in Supabase as well.
 
 ## Deploying
 

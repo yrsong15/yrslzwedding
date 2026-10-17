@@ -73,12 +73,15 @@ export const schedule = [
 ];
 
 export const hotel = {
-  name: "The Hollis Hotel",
+  name: "Canopy by Hilton Portland Pearl District",
+  shortName: "Canopy by Hilton",
   neighborhood: "Pearl District",
-  address: "1100 NW Glisan St, Portland, OR 97209",
-  bookingUrl: "https://example.com/hollis-hotel-block",
-  code: "YRLZ2027",
-  cutoff: "June 23, 2027",
+  address: "425 NW 9th Ave, Portland, OR 97209",
+  url: "https://www.hilton.com/en/hotels/pdxpepy-canopy-portland-pearl-district/",
+  // Per Hilton's listing (Oct 2026); recheck before the wedding.
+  parking: "valet only (about $60 per night), no self-parking",
+  // Fill in if you reserve a room block; the Travel page shows it when set.
+  block: null as null | { bookingUrl: string; code: string; cutoff: string },
 };
 
 export const thingsToDo = [

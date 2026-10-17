@@ -15,7 +15,7 @@ const transport = [
   },
   {
     title: "Rental car",
-    body: "All the major rental companies operate at PDX. Handy for day trips to the Gorge or the coast. Just note that downtown parking can be pricey.",
+    body: `All the major rental companies operate at PDX. Handy for day trips to the Gorge or the coast. Just note that downtown parking can be pricey. Parking at the ${hotel.shortName} is ${hotel.parking}.`,
   },
 ];
 
@@ -26,22 +26,32 @@ export default function TravelPage() {
 
       <FadeIn className="mx-auto max-w-3xl px-4">
         <div className="rounded-3xl bg-sage-dark px-6 py-10 text-center text-cream sm:px-12">
-          <p className="text-xs uppercase tracking-[0.3em] text-cream/70">Hotel block</p>
-          <h2 className="mt-3 font-serif text-4xl">{hotel.name}</h2>
-          <p className="mt-1 text-cream/80">{hotel.neighborhood}, downtown Portland</p>
-          <p className="text-sm text-cream/60">{hotel.address}</p>
-          <p className="mx-auto mt-6 max-w-lg leading-relaxed text-cream/90">
-            We&apos;ve reserved a block of rooms at a discounted rate. Use code{" "}
-            <span className="rounded bg-cream/15 px-2 py-0.5 font-mono tracking-wider">{hotel.code}</span> when
-            booking. Please reserve by {hotel.cutoff}.
+          <p className="text-xs uppercase tracking-[0.3em] text-cream/70">
+            {hotel.block ? "Hotel block" : "Where to stay"}
           </p>
+          <h2 className="mt-3 font-serif text-4xl">{hotel.name}</h2>
+          <p className="mt-1 text-cream/80">{hotel.neighborhood}, Portland</p>
+          <p className="text-sm text-cream/60">{hotel.address}</p>
+          <p className="mt-1 text-sm text-cream/60">Parking: {hotel.parking}</p>
+          {hotel.block ? (
+            <p className="mx-auto mt-6 max-w-lg leading-relaxed text-cream/90">
+              We&apos;ve reserved a block of rooms at a discounted rate. Use code{" "}
+              <span className="rounded bg-cream/15 px-2 py-0.5 font-mono tracking-wider">{hotel.block.code}</span>{" "}
+              when booking. Please reserve by {hotel.block.cutoff}.
+            </p>
+          ) : (
+            <p className="mx-auto mt-6 max-w-lg leading-relaxed text-cream/90">
+              Our recommended hotel is just a few blocks down NW 9th Avenue from the venue, and an easy walk
+              to Powell&apos;s, coffee shops, and restaurants in the Pearl.
+            </p>
+          )}
           <a
-            href={hotel.bookingUrl}
+            href={hotel.block?.bookingUrl ?? hotel.url}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-8 inline-block rounded-full bg-cream px-8 py-3 text-sm uppercase tracking-[0.2em] text-sage-dark transition hover:bg-terracotta hover:text-cream"
           >
-            Book your room
+            {hotel.block ? "Book your room" : "Visit hotel website"} ↗
           </a>
         </div>
       </FadeIn>

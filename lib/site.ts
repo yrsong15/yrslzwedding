@@ -133,6 +133,85 @@ export const thingsToDo = [
   },
 ];
 
+// Food & drink recommendations on the Things to Do page. Give single-location
+// places a `map` query (name + address); places with several locations get
+// `multiple: true` instead and no map link.
+type Place = { name: string; tag: string; blurb: string } & ({ map: string } | { multiple: true });
+
+export const foodAndDrink: { title: string; places: Place[]; footnote?: string }[] = [
+  {
+    title: "Restaurants",
+    places: [
+      {
+        name: "Langbaan",
+        tag: "Thai",
+        blurb:
+          "Named the best restaurant in the entire country (James Beard Outstanding Restaurant, 2024). An upscale, intimate tasting menu.",
+        map: "Langbaan, 1818 NW 23rd Pl, Portland, OR",
+      },
+      {
+        name: "Kann",
+        tag: "Haitian",
+        blurb:
+          "Won the James Beard Award for Best New Restaurant (2023). Incredible food and drinks. You can even do a tasting of clairin, which is Haitian rum.",
+        map: "Kann, 548 SE Ash St, Portland, OR",
+      },
+      {
+        name: "Javelina",
+        tag: "Indigenous",
+        blurb:
+          "Cuisine made with 100% Native American ingredients and recipes. They have a ton of amazing tea, too.",
+        map: "Javelina restaurant, Portland, OR",
+      },
+      {
+        name: "Noble Rot",
+        tag: "American, farm-to-table",
+        blurb: "Their farm is literally a garden on their rooftop patio, and you can see it growing.",
+        map: "Noble Rot, 1111 E Burnside St, Portland, OR",
+      },
+      {
+        name: "The Paper Bridge",
+        tag: "Vietnamese",
+        blurb: "Authentic Northern Vietnamese cooking.",
+        map: "The Paper Bridge, 828 SE Ash St, Portland, OR",
+      },
+      {
+        name: "Pho Van",
+        tag: "Vietnamese",
+        blurb:
+          "A little out of the way, but well worth the trip. Portland has a huge Southeast Asian community.",
+        // Has several locations; we specifically recommend the original on 82nd.
+        map: "Pho Van, 1919 SE 82nd Ave, Portland, OR 97216",
+      },
+    ],
+  },
+  {
+    title: "Donuts, Cafés & Dessert",
+    places: [
+      { name: "Voodoo Doughnut", tag: "Doughnuts", blurb: "Portland's famously offbeat doughnut shop.", multiple: true },
+      { name: "Blue Star Donuts", tag: "Doughnuts", blurb: "Brioche doughnuts in creative flavors.", multiple: true },
+      { name: "Pip's Original Doughnuts & Chai", tag: "Doughnuts & chai", blurb: "Tiny made-to-order doughnuts and house-made chai.", multiple: true },
+      { name: "Salt & Straw", tag: "Ice cream", blurb: "Inventive ice cream flavors. They started here in Portland, and we got engaged at one of their NYC shops!", multiple: true },
+      { name: "Stumptown Coffee", tag: "Coffee", blurb: "The coffee roaster that also got its start in Portland.", multiple: true },
+    ],
+  },
+  {
+    title: "Bars",
+    places: [
+      { name: "Scotch Lodge", tag: "Whiskey & cocktails", blurb: "A cozy, whiskey-focused cocktail bar.", map: "Scotch Lodge, 215 SE 9th Ave, Portland, OR" },
+      { name: "Wayfinder Beer", tag: "Brewery", blurb: "Where we're hosting Friday's welcome drinks!", map: "Wayfinder Beer, 304 SE 2nd Ave, Portland, OR" },
+      { name: "Hey Love", tag: "Cocktails", blurb: "A cocktail lounge in the Jupiter NEXT hotel.", map: "Hey Love, 920 E Burnside St, Portland, OR" },
+      {
+        name: "Deschutes Brewery",
+        tag: "Brewery",
+        blurb: "Near Powell's City of Books, and right across the street from the afterparty.",
+        map: "Deschutes Brewery Portland Public House, 210 NW 11th Ave, Portland, OR",
+      },
+    ],
+    footnote: "In general, breweries are everywhere in Portland, and we have yet to find a bad one.",
+  },
+];
+
 export const faqs = [
   {
     q: "What should I wear?",

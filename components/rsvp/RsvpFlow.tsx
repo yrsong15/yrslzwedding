@@ -122,7 +122,7 @@ function Lookup({ onFound }: { onFound: (parties: Party[]) => void }) {
           id="rsvp-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Jane Smith"
+          placeholder="e.g. Heungmin Son"
           autoComplete="name"
           className="flex-1 rounded-full border border-ink/20 bg-white/70 px-5 py-3 outline-none transition focus:border-lavender focus:ring-2 focus:ring-lavender/30"
         />

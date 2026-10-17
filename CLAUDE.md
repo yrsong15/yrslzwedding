@@ -45,7 +45,7 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
   - Guest-facing queries in `lib/rsvp.ts` list columns explicitly (`PUBLIC_GUEST_COLUMNS`, `PARTY_SELECT`). They filter and order on admin columns without selecting them. Never go back to `guests(*)` there.
   - The public `Guest` / `Party` types omit them. `AdminGuest` / `AdminParty` in `lib/types.ts` add them, for admin code only.
 - **RSVP API:** `lib/rsvp.ts` holds the logic (zod schema, `validateAgainstParty`, `saveRsvp`, `clearRsvp`). The route handlers in `app/api/rsvp/` are thin wrappers. `POST` overwrites the earlier answers (edits) and `DELETE` resets a party to unanswered. `DELETE` keeps plus-one names; only a "not coming" answer in `POST` blanks them. Validation runs both client-side (`components/rsvp/RsvpForm.tsx`) and server-side, so keep the two in sync.
-- **Admin guest list** (`/admin`, `components/admin/GuestList.tsx`): invite switches per person and per party, a Lauren / Young Re toggle per party, click-to-rename, drag to reorder (`@dnd-kit`), search and filters, and adding and deleting people and parties.
+- **Admin guest list** (`/admin`, `components/admin/GuestList.tsx`): invite switches per person and per party, a Lauren / Young Re toggle per party, a pencil button to rename each person and party, drag to reorder (`@dnd-kit`), search and filters, and adding and deleting people and parties.
   - **Routes:** `app/api/admin/guests` (`PATCH` with `action` invite / rename / reorder, `POST` add a person, `DELETE`) and `app/api/admin/parties` (`PATCH` with `action` rename / side / reorder, `POST`, `DELETE`). Each one goes through `adminMutation` in `lib/admin.ts`, which checks `isAdmin()` and the zod body.
   - **Rules:**
     - A new party needs a side.

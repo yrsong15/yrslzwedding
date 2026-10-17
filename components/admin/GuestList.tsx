@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useState, useTransition } from "react";
+import { useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   DndContext,
@@ -552,7 +552,7 @@ function GuestRow({
   );
 }
 
-/** Click to edit in place. Enter saves, Escape cancels. */
+/** Text with a pencil button that swaps it for inputs. Enter saves, Escape cancels. */
 function EditableText({
   fields,
   onSave,
@@ -566,28 +566,47 @@ function EditableText({
 }) {
   const [editing, setEditing] = useState(false);
   const [values, setValues] = useState<string[]>([]);
+  const pencil = useRef<HTMLButtonElement>(null);
+  const refocus = useRef(false);
+
+  // Put keyboard focus back on the pencil when editing ends, instead of losing it.
+  useEffect(() => {
+    if (!editing && refocus.current) {
+      refocus.current = false;
+      pencil.current?.focus();
+    }
+  }, [editing]);
+
+  function stop() {
+    refocus.current = true;
+    setEditing(false);
+  }
 
   if (!editing) {
     return (
-      <button
-        type="button"
-        onClick={() => {
-          setValues(fields.map((f) => f.value));
-          setEditing(true);
-        }}
-        aria-label={editLabel}
-        title="Click to edit"
-        className="text-left decoration-dotted underline-offset-4 hover:underline"
-      >
+      <span className="inline-flex items-center gap-1">
         {display}
-      </button>
+        <button
+          ref={pencil}
+          type="button"
+          onClick={() => {
+            setValues(fields.map((f) => f.value));
+            setEditing(true);
+          }}
+          aria-label={editLabel}
+          title={editLabel}
+          className="rounded p-1 text-muted transition hover:text-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+        >
+          <Pencil />
+        </button>
+      </span>
     );
   }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const next = values.map((v) => v.trim().replace(/\s+/g, " "));
-    setEditing(false);
+    stop();
     if (next.some((v, i) => v !== fields[i].value)) onSave(next);
   }
 
@@ -595,7 +614,7 @@ function EditableText({
     <form
       onSubmit={submit}
       onKeyDown={(e) => {
-        if (e.key === "Escape") setEditing(false);
+        if (e.key === "Escape") stop();
       }}
       className="flex flex-wrap items-center gap-2"
     >
@@ -614,10 +633,28 @@ function EditableText({
       <button type="submit" className="rounded-full bg-plum px-4 py-1.5 text-xs uppercase tracking-[0.15em] text-cream hover:bg-ink">
         Save
       </button>
-      <button type="button" onClick={() => setEditing(false)} className={quietButton}>
+      <button type="button" onClick={stop} className={quietButton}>
         Cancel
       </button>
     </form>
+  );
+}
+
+function Pencil() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      className="size-3.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+      <path d="m15 5 4 4" />
+    </svg>
   );
 }
 

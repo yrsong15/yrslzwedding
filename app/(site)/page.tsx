@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import FadeIn from "@/components/FadeIn";
-import { couple, koreanMessage, location, rsvpDeadline, weddingDate, weddingDateLabel } from "@/lib/site";
+import { couple, koreanMessage, location, rsvpDeadline, venue, weddingDate, weddingDateLabel } from "@/lib/site";
 
 export default function Home() {
   return (
@@ -12,7 +12,9 @@ export default function Home() {
         <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-poppy/15 blur-3xl" />
 
         <FadeIn>
-          <p className="text-xs uppercase tracking-[0.35em] text-lavender">Together with their families</p>
+          <p lang="ko" className="font-korean text-lg text-lavender [word-break:keep-all] sm:text-xl">
+            {koreanMessage}
+          </p>
         </FadeIn>
         <FadeIn delay={0.15}>
           <h1 className="mt-6 font-serif text-6xl leading-none text-plum sm:text-8xl">{couple.names}</h1>
@@ -20,11 +22,10 @@ export default function Home() {
         <FadeIn delay={0.3}>
           <p className="mt-6 font-serif text-2xl italic text-muted">are getting married</p>
           <div className="mx-auto my-8 h-px w-20 bg-poppy/60" />
-          <p lang="ko" className="mb-6 font-korean text-lg text-plum [word-break:keep-all]">
-            {koreanMessage}
-          </p>
           <p className="text-sm uppercase tracking-[0.3em] text-ink">{weddingDateLabel}</p>
-          <p className="mt-2 text-sm uppercase tracking-[0.3em] text-muted">{location}</p>
+          <p className="mt-2 text-sm uppercase tracking-[0.3em] text-muted">
+            {venue} · {location}
+          </p>
         </FadeIn>
         <FadeIn delay={0.45} className="mt-12">
           <Countdown target={weddingDate.toISOString()} />

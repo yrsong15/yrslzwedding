@@ -238,15 +238,15 @@ export const faqs = [
 
 export const charities = [
   {
-    name: "The ALS Association",
+    name: "Alzheimer's Association",
     blurb:
-      "Funding research, care services, and advocacy for people living with ALS and their families.",
-    url: "https://www.als.org/donate",
+      "Providing care and support for people living with Alzheimer's and their families, and accelerating research toward a cure.",
+    url: "https://donorservices.alz.org/page/FUNYAFYQDKA",
   },
   {
     name: "Brooklyn Bridge Park Conservancy",
     blurb:
       "Supporting free programs, public art, and stewardship of the waterfront park that we run in every single morning.",
-    url: "https://brooklynbridgepark.org/support/",
+    url: "https://brooklynbridgepark.org/support/donate/",
   },
 ];

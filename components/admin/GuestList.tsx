@@ -310,8 +310,9 @@ export default function GuestList({ parties }: { parties: AdminParty[] }) {
                 <th className="w-8">
                   <span className="sr-only">Reorder</span>
                 </th>
-                {["Invite", "Name", "Wedding", "Welcome", "Meal", "Dietary"].map((h) => (
-                  <th key={h} className="whitespace-nowrap px-4 py-3 font-normal">
+                {/* whitespace-pre: never wraps on its own, but keeps the \n line break. */}
+                {["Invite", "Name", "Guest of", "Wedding", "Welcome\ndrinks", "Meal", "Dietary"].map((h) => (
+                  <th key={h} className="whitespace-pre px-4 py-3 font-normal">
                     {h}
                   </th>
                 ))}
@@ -407,36 +408,38 @@ function PartyRows({
             />
           )}
         </td>
-        <td colSpan={6} className="px-4 py-2.5">
-          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <EditableText
-                fields={[{ label: "Party name", value: party.name, required: true, width: "w-64" }]}
-                onSave={([name]) => onChange({ type: "rename-party", id: party.id, name })}
-                editLabel={`Rename party: ${party.name}`}
-                display={<span className="font-serif text-xl text-plum">{party.name}</span>}
-              />
-              <span className="whitespace-nowrap text-xs text-muted">
-                {invited} of {total} invited
-                {party.responded_at ? ` · responded ${shortDate(party.responded_at)}` : ""}
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-5">
-              <SideToggle
-                value={party.side}
-                partyName={party.name}
-                onChange={(side) => onChange({ type: "side", partyId: party.id, side })}
-              />
-              {!adding && (
-                <button onClick={() => setAdding(true)} className={quietButton}>
-                  + Add to party
-                </button>
-              )}
-              <button onClick={onRemoveParty} className={quietButton}>
-                Delete party
-              </button>
-            </div>
+        <td className="px-4 py-2.5">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <EditableText
+              fields={[{ label: "Party name", value: party.name, required: true, width: "w-64" }]}
+              onSave={([name]) => onChange({ type: "rename-party", id: party.id, name })}
+              editLabel={`Rename party: ${party.name}`}
+              display={<span className="font-serif text-xl text-plum">{party.name}</span>}
+            />
+            <span className="whitespace-nowrap text-xs text-muted">
+              {invited} of {total} invited
+              {party.responded_at ? ` · responded ${shortDate(party.responded_at)}` : ""}
+            </span>
           </div>
+        </td>
+        <td className="px-4 py-2.5">
+          <SideToggle
+            value={party.side}
+            partyName={party.name}
+            onChange={(side) => onChange({ type: "side", partyId: party.id, side })}
+          />
+        </td>
+        <td colSpan={4} />
+        {/* In the remove column, lined up with each person's × button. */}
+        <td className="px-4 py-2.5 text-right">
+          <button
+            onClick={onRemoveParty}
+            aria-label={`Delete party: ${party.name}`}
+            title="Delete party"
+            className="p-1 text-muted transition hover:text-orange-dark"
+          >
+            <Trash />
+          </button>
         </td>
       </tr>
 
@@ -468,14 +471,19 @@ function PartyRows({
         </SortableContext>
       </DndContext>
 
-      {adding && (
-        <tr>
-          <td colSpan={2} />
-          <td colSpan={6} className="px-4 py-3">
+      {/* Last line of the party, under its people, so it reads as part of the group. */}
+      <tr>
+        <td colSpan={2} />
+        <td colSpan={7} className={adding ? "px-4 py-3" : "px-4 pb-3 pt-1"}>
+          {adding ? (
             <AddGuestForm partyId={party.id} onClose={() => setAdding(false)} />
-          </td>
-        </tr>
-      )}
+          ) : (
+            <button onClick={() => setAdding(true)} className={quietButton}>
+              + Add to party
+            </button>
+          )}
+        </td>
+      </tr>
     </tbody>
   );
 }
@@ -531,6 +539,7 @@ function GuestRow({
           display={<span className={dim}>{name ?? <span className="text-muted">(plus-one)</span>}</span>}
         />
       </td>
+      <td />
       <td className={cell}>
         <Badge v={answer(g.attending)} />
       </td>
@@ -640,6 +649,25 @@ function EditableText({
   );
 }
 
+function Trash() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      className="size-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+    </svg>
+  );
+}
+
 function Pencil() {
   return (
     <svg
@@ -671,12 +699,14 @@ function SideToggle({ value, partyName, onChange }: { value: Side | null; partyN
           key={s.value}
           type="button"
           aria-pressed={value === s.value}
+          aria-label={s.label}
+          title={s.label}
           onClick={() => value !== s.value && onChange(s.value)}
           className={`whitespace-nowrap px-3 py-1 transition ${
             value === s.value ? "bg-plum text-cream" : "text-plum hover:bg-lavender/15"
           }`}
         >
-          {s.label}
+          {s.short}
         </button>
       ))}
     </div>

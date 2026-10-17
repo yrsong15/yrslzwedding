@@ -6,9 +6,10 @@ export const couple = {
 };
 
 // Whose guest an invite is. Admin only: guests never see which side they're on.
+// `short` is for the compact toggle in the /admin guest table.
 export const sides = [
-  { value: "lauren", label: "Lauren" },
-  { value: "young_re", label: "Young Re" },
+  { value: "lauren", label: "Lauren", short: "LZ" },
+  { value: "young_re", label: "Young Re", short: "YRS" },
 ] as const;
 
 export const weddingDate = new Date("2027-07-24T17:00:00-07:00");

@@ -86,7 +86,7 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
     <form onSubmit={submit} className="space-y-6">
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.25em] text-muted">Invitation for</p>
-        <h2 className="font-serif text-4xl text-sage-dark">{party.name}</h2>
+        <h2 className="font-serif text-4xl text-plum">{party.name}</h2>
       </div>
 
       {drafts.map((d, i) => (
@@ -133,7 +133,7 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
                         <label
                           key={m.value}
                           className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition ${
-                            d.meal === m.value ? "border-sage bg-sage/10" : "border-ink/10 hover:border-sage/60"
+                            d.meal === m.value ? "border-lavender bg-lavender/10" : "border-ink/10 hover:border-lavender/60"
                           }`}
                         >
                           <input
@@ -141,7 +141,7 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
                             name={`meal-${d.id}`}
                             checked={d.meal === m.value}
                             onChange={() => update(d.id, { meal: m.value })}
-                            className="accent-sage-dark"
+                            className="accent-plum"
                           />
                           {m.label}
                         </label>
@@ -159,7 +159,7 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
                       maxLength={500}
                       value={d.dietary}
                       onChange={(e) => update(d.id, { dietary: e.target.value })}
-                      className="w-full rounded-xl border border-ink/15 bg-white/70 px-4 py-3 outline-none transition focus:border-sage focus:ring-2 focus:ring-sage/30"
+                      className="w-full rounded-xl border border-ink/15 bg-white/70 px-4 py-3 outline-none transition focus:border-lavender focus:ring-2 focus:ring-lavender/30"
                     />
                   </div>
                 </div>
@@ -179,14 +179,14 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
         </motion.fieldset>
       ))}
 
-      <p className="min-h-6 text-center text-sm text-terracotta" role="alert">
+      <p className="min-h-6 text-center text-sm text-poppy" role="alert">
         {error}
       </p>
       <div className="text-center">
         <button
           type="submit"
           disabled={saving}
-          className="rounded-full bg-terracotta px-10 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-terracotta-dark disabled:opacity-50"
+          className="rounded-full bg-poppy px-10 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-poppy-dark disabled:opacity-50"
         >
           {saving ? "Sending…" : party.responded_at ? "Update RSVP" : "Send RSVP"}
         </button>
@@ -210,7 +210,7 @@ function Choice({
 }) {
   const btn = (active: boolean) =>
     `flex-1 rounded-full border px-4 py-2.5 text-sm transition ${
-      active ? "border-sage-dark bg-sage-dark text-cream" : "border-ink/15 hover:border-sage"
+      active ? "border-plum bg-plum text-cream" : "border-ink/15 hover:border-lavender"
     }`;
   return (
     <div className="mt-5">
@@ -235,7 +235,7 @@ function Input({ label, value, onChange }: { label: string; value: string; onCha
         value={value}
         maxLength={80}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-ink/15 bg-white/70 px-4 py-2.5 outline-none transition focus:border-sage focus:ring-2 focus:ring-sage/30"
+        className="w-full rounded-xl border border-ink/15 bg-white/70 px-4 py-2.5 outline-none transition focus:border-lavender focus:ring-2 focus:ring-lavender/30"
       />
     </label>
   );

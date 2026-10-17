@@ -12,13 +12,13 @@ export default function Logo({ className = "" }: { className?: string }) {
     <span
       role="img"
       aria-label="LYR — Lauren & Young Re"
-      className={`inline-flex items-baseline font-serif leading-none text-sage-dark ${className}`}
+      className={`inline-flex items-baseline font-serif leading-none text-plum ${className}`}
     >
       <span aria-hidden>L</span>
       <svg
         aria-hidden
         viewBox="5 2.5 50 44"
-        className="ml-[0.0644em] mr-[0.035em] inline-block h-[0.66em] w-[0.75em] overflow-visible text-terracotta"
+        className="ml-[0.0644em] mr-[0.035em] inline-block h-[0.66em] w-[0.75em] overflow-visible text-poppy"
       >
         <g fill="none" stroke="currentColor" strokeWidth={3.6} strokeLinecap="butt" strokeLinejoin="miter">
           <path d="M30 46.5V30C30 18 24 11 10 11M30 30C30 18 36 11 50 11" />

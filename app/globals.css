@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
+/* "Orange and violet wildflowers", kept muted. Contrast-checked: ink/muted/plum
+   on cream and linen pass AA; cream on poppy is 3.8:1 (fine for large/bold
+   button text), and lavender passes 3:1 as small-label text. */
 @theme {
-  --color-cream: #fbf7f0;
-  --color-linen: #f3ece0;
-  --color-sage: #8a9a7b;
-  --color-sage-dark: #4f5d45;
-  --color-terracotta: #c46a4a;
-  --color-terracotta-dark: #a5543a;
-  --color-ink: #2e2a26;
-  --color-muted: #6b645c;
+  --color-cream: #fbf8f3; /* page background */
+  --color-linen: #f3eef4; /* alternate sections (pale lavender mist) */
+  --color-lavender: #8f80a9; /* labels, timeline dots, focus rings, soft tints */
+  --color-plum: #4d3b5e; /* headings, logo letters, dark buttons and cards */
+  --color-poppy: #c0662f; /* highlight: primary buttons, links, the logo's Y */
+  --color-poppy-dark: #9f5024; /* poppy hover */
+  --color-ink: #2d2733; /* body text */
+  --color-muted: #6a6272; /* secondary text */
 }
 
 /* inline: next/font sets these vars on <body>, so they must resolve at use
@@ -28,5 +31,5 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-sage) 35%, transparent);
+  background: color-mix(in srgb, var(--color-lavender) 35%, transparent);
 }

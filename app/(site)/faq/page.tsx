@@ -12,9 +12,9 @@ export default function FaqPage() {
         {faqs.map((f, i) => (
           <FadeIn key={f.q} delay={i * 0.05}>
             <details className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-serif text-2xl text-sage-dark">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-serif text-2xl text-plum">
                 {f.q}
-                <span className="text-terracotta transition-transform group-open:rotate-45">+</span>
+                <span className="text-poppy transition-transform group-open:rotate-45">+</span>
               </summary>
               <p className="mt-3 leading-relaxed text-muted">{f.a}</p>
             </details>
@@ -23,7 +23,7 @@ export default function FaqPage() {
       </div>
       <p className="mt-12 text-center text-muted">
         Still have questions? Email us at{" "}
-        <a href={`mailto:${couple.contactEmail}`} className="text-terracotta hover:underline">
+        <a href={`mailto:${couple.contactEmail}`} className="text-poppy hover:underline">
           {couple.contactEmail}
         </a>
         .

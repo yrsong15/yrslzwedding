@@ -48,11 +48,11 @@ export default function RsvpSummary({
         initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-sage/20 font-serif text-3xl text-sage-dark"
+        className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-lavender/20 font-serif text-3xl text-plum"
       >
         {anyoneComing ? "♥" : "✉"}
       </motion.div>
-      <h2 className="mt-4 font-serif text-4xl text-sage-dark">
+      <h2 className="mt-4 font-serif text-4xl text-plum">
         {anyoneComing ? "We can't wait to celebrate with you!" : "We'll miss you!"}
       </h2>
       <p className="mt-2 text-muted">Here&apos;s what we have for {party.name}:</p>
@@ -64,7 +64,7 @@ export default function RsvpSummary({
               <p className="font-serif text-2xl">
                 {g.first_name} {g.last_name}
               </p>
-              <span className={`text-sm ${g.attending ? "text-sage-dark" : "text-muted"}`}>
+              <span className={`text-sm ${g.attending ? "text-plum" : "text-muted"}`}>
                 {g.attending ? "Attending" : "Not attending"}
               </span>
             </div>
@@ -92,19 +92,19 @@ export default function RsvpSummary({
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button
           onClick={onEdit}
-          className="rounded-full border border-sage-dark px-8 py-3 text-sm uppercase tracking-[0.2em] text-sage-dark transition hover:bg-sage-dark hover:text-cream"
+          className="rounded-full border border-plum px-8 py-3 text-sm uppercase tracking-[0.2em] text-plum transition hover:bg-plum hover:text-cream"
         >
           Edit RSVP
         </button>
         <button
           onClick={clear}
           disabled={clearing}
-          className="rounded-full px-6 py-3 text-sm uppercase tracking-[0.2em] text-muted transition hover:text-terracotta disabled:opacity-50"
+          className="rounded-full px-6 py-3 text-sm uppercase tracking-[0.2em] text-muted transition hover:text-poppy disabled:opacity-50"
         >
           {clearing ? "Clearing…" : "Clear response"}
         </button>
       </div>
-      <p className="mt-3 min-h-5 text-sm text-terracotta" role="alert">
+      <p className="mt-3 min-h-5 text-sm text-poppy" role="alert">
         {error}
       </p>
     </div>

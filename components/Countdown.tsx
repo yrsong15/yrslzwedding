@@ -34,7 +34,7 @@ export default function Countdown({ target }: { target: string }) {
     <div className="flex justify-center gap-3 sm:gap-6" aria-label="Countdown to the wedding">
       {units.map(([label, value]) => (
         <div key={label} className="w-16 text-center sm:w-20">
-          <div className="font-serif text-4xl tabular-nums text-sage-dark sm:text-5xl">
+          <div className="font-serif text-4xl tabular-nums text-plum sm:text-5xl">
             {value === undefined ? "–" : String(value).padStart(2, "0")}
           </div>
           <div className="mt-1 text-[10px] uppercase tracking-[0.25em] text-muted sm:text-xs">{label}</div>

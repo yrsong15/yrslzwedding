@@ -25,7 +25,7 @@ export default function TravelPage() {
       <PageHeader eyebrow="Getting here" title="Travel & Lodging" />
 
       <FadeIn className="mx-auto max-w-3xl px-4">
-        <div className="rounded-3xl bg-sage-dark px-6 py-10 text-center text-cream sm:px-12">
+        <div className="rounded-3xl bg-plum px-6 py-10 text-center text-cream sm:px-12">
           <p className="text-xs uppercase tracking-[0.3em] text-cream/70">
             {hotel.block ? "Hotel block" : "Where to stay"}
           </p>
@@ -49,7 +49,7 @@ export default function TravelPage() {
             href={hotel.block?.bookingUrl ?? hotel.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-8 inline-block rounded-full bg-cream px-8 py-3 text-sm uppercase tracking-[0.2em] text-sage-dark transition hover:bg-terracotta hover:text-cream"
+            className="mt-8 inline-block rounded-full bg-cream px-8 py-3 text-sm uppercase tracking-[0.2em] text-plum transition hover:bg-poppy hover:text-cream"
           >
             {hotel.block ? "Book your room" : "Visit hotel website"} ↗
           </a>
@@ -58,14 +58,14 @@ export default function TravelPage() {
 
       <section className="mx-auto mt-20 max-w-5xl px-4">
         <FadeIn>
-          <h2 className="text-center font-serif text-4xl text-sage-dark">From PDX to downtown</h2>
+          <h2 className="text-center font-serif text-4xl text-plum">From PDX to downtown</h2>
           <p className="mt-3 text-center text-muted">Portland International Airport (PDX) is about 10 miles from the city center.</p>
         </FadeIn>
         <div className="mt-10 grid gap-6 sm:grid-cols-3">
           {transport.map((t, i) => (
             <FadeIn key={t.title} delay={i * 0.1}>
               <div className="h-full rounded-2xl border border-ink/10 bg-white/60 p-6">
-                <h3 className="font-serif text-2xl text-terracotta">{t.title}</h3>
+                <h3 className="font-serif text-2xl text-poppy">{t.title}</h3>
                 <p className="mt-3 leading-relaxed text-muted">{t.body}</p>
               </div>
             </FadeIn>

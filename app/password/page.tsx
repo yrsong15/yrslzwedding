@@ -32,12 +32,12 @@ export default function PasswordPage() {
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-md text-center"
       >
-        <p className="text-xs uppercase tracking-[0.35em] text-sage">Welcome to the wedding of</p>
-        <h1 className="mt-4 font-serif text-5xl text-sage-dark sm:text-6xl">{couple.names}</h1>
+        <p className="text-xs uppercase tracking-[0.35em] text-lavender">Welcome to the wedding of</p>
+        <h1 className="mt-4 font-serif text-5xl text-plum sm:text-6xl">{couple.names}</h1>
         <p className="mt-4 font-serif text-xl italic text-muted">
           {weddingDateLabel} · {location}
         </p>
-        <div className="mx-auto my-8 h-px w-16 bg-terracotta/60" />
+        <div className="mx-auto my-8 h-px w-16 bg-poppy/60" />
         <p className="mb-6 text-sm text-muted">Please enter the password from your invitation.</p>
         <Suspense>
           <Gate />

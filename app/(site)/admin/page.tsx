@@ -52,7 +52,7 @@ export default async function AdminPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-ink/10 bg-white/60 p-5 text-center">
-            <p className="font-serif text-4xl text-sage-dark">{s.value}</p>
+            <p className="font-serif text-4xl text-plum">{s.value}</p>
             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted">{s.label}</p>
           </div>
         ))}
@@ -60,7 +60,7 @@ export default async function AdminPage() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <section className="rounded-2xl border border-ink/10 bg-white/60 p-6">
-          <h2 className="font-serif text-2xl text-sage-dark">Meals</h2>
+          <h2 className="font-serif text-2xl text-plum">Meals</h2>
           <ul className="mt-3 space-y-1">
             {meals.map((m) => (
               <li key={m.value} className="flex justify-between">
@@ -71,7 +71,7 @@ export default async function AdminPage() {
           </ul>
         </section>
         <section className="rounded-2xl border border-ink/10 bg-white/60 p-6">
-          <h2 className="font-serif text-2xl text-sage-dark">Dietary notes</h2>
+          <h2 className="font-serif text-2xl text-plum">Dietary notes</h2>
           {dietary.length === 0 ? (
             <p className="mt-3 text-muted">None yet.</p>
           ) : (
@@ -90,10 +90,10 @@ export default async function AdminPage() {
       </div>
 
       <div className="mt-10 flex items-center justify-between">
-        <h2 className="font-serif text-3xl text-sage-dark">All guests</h2>
+        <h2 className="font-serif text-3xl text-plum">All guests</h2>
         <a
           href="/api/admin/export"
-          className="rounded-full bg-sage-dark px-6 py-2.5 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-ink"
+          className="rounded-full bg-plum px-6 py-2.5 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-ink"
         >
           Download CSV
         </a>
@@ -138,6 +138,6 @@ export default async function AdminPage() {
 
 function Badge({ v }: { v: string }) {
   const style =
-    v === "yes" ? "bg-sage/20 text-sage-dark" : v === "no" ? "bg-terracotta/15 text-terracotta-dark" : "bg-ink/5 text-muted";
+    v === "yes" ? "bg-lavender/20 text-plum" : v === "no" ? "bg-poppy/15 text-poppy-dark" : "bg-ink/5 text-muted";
   return <span className={`rounded-full px-2.5 py-0.5 text-xs ${style}`}>{v}</span>;
 }

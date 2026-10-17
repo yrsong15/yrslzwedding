@@ -41,9 +41,9 @@ export default function RsvpFlow() {
             <button
               key={p.id}
               onClick={() => setStep(p.responded_at ? { kind: "done", party: p } : { kind: "form", party: p })}
-              className="block w-full rounded-2xl border border-ink/10 bg-white/60 p-5 text-left transition hover:border-sage"
+              className="block w-full rounded-2xl border border-ink/10 bg-white/60 p-5 text-left transition hover:border-lavender"
             >
-              <p className="font-serif text-2xl text-sage-dark">{p.name}</p>
+              <p className="font-serif text-2xl text-plum">{p.name}</p>
               <p className="text-sm text-muted">
                 {p.guests.filter((g) => !g.is_plus_one).map((g) => `${g.first_name} ${g.last_name}`).join(", ")}
               </p>
@@ -77,7 +77,7 @@ export default function RsvpFlow() {
 function BackLink({ onClick, label = "← Back to search" }: { onClick: () => void; label?: string }) {
   return (
     <p className="mt-8 text-center">
-      <button onClick={onClick} className="text-sm text-muted underline-offset-4 hover:text-terracotta hover:underline">
+      <button onClick={onClick} className="text-sm text-muted underline-offset-4 hover:text-poppy hover:underline">
         {label}
       </button>
     </p>
@@ -124,17 +124,17 @@ function Lookup({ onFound }: { onFound: (parties: Party[]) => void }) {
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g. Jane Smith"
           autoComplete="name"
-          className="flex-1 rounded-full border border-ink/20 bg-white/70 px-5 py-3 outline-none transition focus:border-sage focus:ring-2 focus:ring-sage/30"
+          className="flex-1 rounded-full border border-ink/20 bg-white/70 px-5 py-3 outline-none transition focus:border-lavender focus:ring-2 focus:ring-lavender/30"
         />
         <button
           type="submit"
           disabled={loading}
-          className="rounded-full bg-sage-dark px-8 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-ink disabled:opacity-50"
+          className="rounded-full bg-plum px-8 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-ink disabled:opacity-50"
         >
           {loading ? "Searching…" : "Find me"}
         </button>
       </div>
-      <p className="mt-4 min-h-6 text-center text-sm text-terracotta" role="alert">
+      <p className="mt-4 min-h-6 text-center text-sm text-poppy" role="alert">
         {error}
       </p>
     </form>

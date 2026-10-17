@@ -25,15 +25,15 @@ export default function Nav() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`relative text-sm uppercase tracking-[0.15em] transition-colors hover:text-terracotta ${
-                  isActive(l.href) ? "text-terracotta" : "text-ink/80"
+                className={`relative text-sm uppercase tracking-[0.15em] transition-colors hover:text-poppy ${
+                  isActive(l.href) ? "text-poppy" : "text-ink/80"
                 }`}
               >
                 {l.label}
                 {isActive(l.href) && (
                   <motion.span
                     layoutId="nav-underline"
-                    className="absolute -bottom-1 left-0 right-0 h-px bg-terracotta"
+                    className="absolute -bottom-1 left-0 right-0 h-px bg-poppy"
                   />
                 )}
               </Link>
@@ -67,7 +67,7 @@ export default function Nav() {
                   href={l.href}
                   onClick={() => setOpen(false)}
                   className={`block px-6 py-3 text-sm uppercase tracking-[0.15em] ${
-                    isActive(l.href) ? "text-terracotta" : "text-ink/80"
+                    isActive(l.href) ? "text-poppy" : "text-ink/80"
                   }`}
                 >
                   {l.label}

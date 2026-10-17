@@ -16,13 +16,13 @@ export default function RegistryPage() {
         {charities.map((c, i) => (
           <FadeIn key={c.name} delay={i * 0.15}>
             <div className="flex h-full flex-col rounded-3xl border border-ink/10 bg-white/60 p-8 text-center">
-              <h2 className="font-serif text-3xl text-sage-dark">{c.name}</h2>
+              <h2 className="font-serif text-3xl text-plum">{c.name}</h2>
               <p className="mt-4 flex-1 leading-relaxed text-muted">{c.blurb}</p>
               <a
                 href={c.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-8 inline-block rounded-full bg-terracotta px-8 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-terracotta-dark"
+                className="mt-8 inline-block rounded-full bg-poppy px-8 py-3 text-sm uppercase tracking-[0.2em] text-cream transition hover:bg-poppy-dark"
               >
                 Donate ↗
               </a>

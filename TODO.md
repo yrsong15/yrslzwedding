@@ -26,7 +26,7 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 
 - [x] **Commit the code to git.** `.env.local` and `guests.csv` are gitignored and must stay that way.
 - [x] **Push to GitHub.** `yrsong15/yrslzwedding`, public by choice.
-- [ ] **Deploy on Vercel.** Import the repo and add the five env vars from `.env.example` with your real values.
+- [x] **Deploy on Vercel.** Live at https://yrslzwedding.vercel.app. Every push to `main` redeploys.
 - [ ] **Custom domain (optional).** Buy one and connect it in Vercel.
 - [ ] **Watch Supabase's free-tier pausing.** Free projects pause after about a week with no activity, and RSVPs fail while paused. Either upgrade, or make sure the project is unpaused before invitations go out and stays in use.
 

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ADMIN_COOKIE, verifyToken } from "./auth";
+import { mealOptions } from "./site";
 import { supabase } from "./supabase";
 import type { AdminParty } from "./types";
 
@@ -59,6 +60,7 @@ const firstName = z.string().trim().max(80);
 const lastName = z.string().trim().max(80);
 const partyName = z.string().trim().max(120);
 const side = z.enum(["lauren", "young_re"]);
+const meal = z.enum(mealOptions.map((m) => m.value) as [string, ...string[]]);
 
 const guestFields = { first_name: firstName, last_name: lastName, is_plus_one: z.boolean(), invited: z.boolean() };
 type NewGuest = { first_name: string; last_name: string; is_plus_one: boolean; invited: boolean };
@@ -76,6 +78,15 @@ export const guestUpdateSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("invite"), ids: z.array(uuid).min(1).max(100), invited: z.boolean() }),
   z.object({ action: z.literal("rename"), id: uuid, first_name: firstName, last_name: lastName }),
   z.object({ action: z.literal("reorder"), partyId: uuid, ids: z.array(uuid).min(1).max(100) }),
+  // null = no answer yet, like on the RSVP form.
+  z.object({
+    action: z.literal("response"),
+    id: uuid,
+    attending: z.boolean().nullable(),
+    attending_welcome: z.boolean().nullable(),
+    meal: meal.nullable(),
+    dietary: z.string().max(500).nullable(),
+  }),
 ]);
 
 export const partyUpdateSchema = z.discriminatedUnion("action", [
@@ -167,7 +178,59 @@ export async function updateGuests(input: z.infer<typeof guestUpdateSchema>): Pr
       if (error) throw error;
       return null;
     }
+    case "response":
+      return setResponse(input);
   }
+}
+
+/**
+ * The couple entering or correcting someone's answers (say, an RSVP by phone).
+ * Same rules as saveRsvp: meal and dietary only for someone attending, welcome
+ * drinks only if the party is invited to them.
+ */
+async function setResponse(input: Extract<z.infer<typeof guestUpdateSchema>, { action: "response" }>): Promise<string | null> {
+  const db = supabase();
+  const { data: guest, error: gErr } = await db.from("guests").select("party_id").eq("id", input.id).maybeSingle();
+  if (gErr) throw gErr;
+  if (!guest) return "That person no longer exists.";
+  const { data: party, error: pErr } = await db
+    .from("parties")
+    .select("invited_to_welcome, responded_at")
+    .eq("id", guest.party_id)
+    .single();
+  if (pErr) throw pErr;
+
+  const attending = input.attending;
+  const welcome = party.invited_to_welcome ? input.attending_welcome : null;
+  const answered = attending !== null || welcome !== null;
+  const now = new Date().toISOString();
+  const { error } = await db
+    .from("guests")
+    .update({
+      attending,
+      attending_welcome: welcome,
+      meal: attending ? input.meal : null,
+      dietary: attending ? input.dietary?.trim() || null : null,
+      updated_at: answered ? now : null,
+    })
+    .eq("id", input.id);
+  if (error) throw error;
+
+  // The party counts as responded once every invited person has a wedding answer.
+  // Keep the original date if it already had one.
+  const { data: invited, error: iErr } = await db
+    .from("guests")
+    .select("attending")
+    .eq("party_id", guest.party_id)
+    .eq("invited", true);
+  if (iErr) throw iErr;
+  const complete = invited.length > 0 && invited.every((g) => g.attending !== null);
+  const responded_at = complete ? (party.responded_at ?? now) : null;
+  if (responded_at !== party.responded_at) {
+    const { error: rErr } = await db.from("parties").update({ responded_at }).eq("id", guest.party_id);
+    if (rErr) throw rErr;
+  }
+  return null;
 }
 
 export async function updateParty(input: z.infer<typeof partyUpdateSchema>): Promise<string | null> {

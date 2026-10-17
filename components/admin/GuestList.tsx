@@ -16,7 +16,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { sides } from "@/lib/site";
+import { mealOptions, sides } from "@/lib/site";
 import type { AdminGuest, AdminParty, Side } from "@/lib/types";
 
 type Draft = { first_name: string; last_name: string; is_plus_one: boolean; invited: boolean };
@@ -39,7 +39,11 @@ type Change =
   | { type: "rename-guest"; id: string; first_name: string; last_name: string }
   | { type: "rename-party"; id: string; name: string }
   | { type: "reorder-parties"; ids: string[] }
-  | { type: "reorder-guests"; partyId: string; ids: string[] };
+  | { type: "reorder-guests"; partyId: string; ids: string[] }
+  | ({ type: "response"; id: string } & Response);
+
+/** A guest's RSVP answers; null = no answer yet. */
+type Response = Pick<AdminGuest, "attending" | "attending_welcome" | "meal" | "dietary">;
 
 const inOrder = <T extends { id: string }>(items: T[], ids: string[]) => {
   const rank = (id: string) => (ids.includes(id) ? ids.indexOf(id) : ids.length);
@@ -66,6 +70,24 @@ function applyChange(parties: AdminParty[], c: Change): AdminParty[] {
       return inOrder(parties, c.ids);
     case "reorder-guests":
       return parties.map((p) => (p.id === c.partyId ? { ...p, guests: inOrder(p.guests, c.ids) } : p));
+    case "response": {
+      // Mirrors the server's rules (setResponse in lib/admin.ts).
+      const { id, attending, attending_welcome, meal, dietary } = c;
+      return parties.map((p) => ({
+        ...p,
+        guests: p.guests.map((g) =>
+          g.id === id
+            ? {
+                ...g,
+                attending,
+                attending_welcome: p.invited_to_welcome ? attending_welcome : null,
+                meal: attending ? meal : null,
+                dietary: attending ? dietary?.trim() || null : null,
+              }
+            : g,
+        ),
+      }));
+    }
   }
 }
 
@@ -83,6 +105,10 @@ function requestFor(c: Change): Promise<string | null> {
       return send("PATCH", "/api/admin/parties", { action: "reorder", ids: c.ids });
     case "reorder-guests":
       return send("PATCH", "/api/admin/guests", { action: "reorder", partyId: c.partyId, ids: c.ids });
+    case "response": {
+      const { id, attending, attending_welcome, meal, dietary } = c;
+      return send("PATCH", "/api/admin/guests", { action: "response", id, attending, attending_welcome, meal, dietary });
+    }
   }
 }
 
@@ -106,6 +132,7 @@ async function send(method: "POST" | "PATCH" | "DELETE", path: string, body: unk
 const guestName = (g: AdminGuest) => (g.is_plus_one && !g.first_name ? null : `${g.first_name} ${g.last_name}`);
 
 const answer = (v: boolean | null) => (v === null ? "pending" : v ? "yes" : "no");
+const fromAnswer = (s: string) => (s === "yes" ? true : s === "no" ? false : null);
 
 const normName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
 
@@ -511,6 +538,32 @@ function GuestRow({
   const dim = g.invited ? "" : "opacity-50";
   const cell = `px-4 py-2.5 ${dim}`;
 
+  // The RSVP answers being edited, or null when not editing.
+  const [draft, setDraft] = useState<Response | null>(null);
+  const formId = `response-${g.id}`;
+  const pencil = useRef<HTMLButtonElement>(null);
+  const refocus = useRef(false);
+
+  // Put keyboard focus back on the pencil when editing ends, as EditableText does.
+  useEffect(() => {
+    if (!draft && refocus.current) {
+      refocus.current = false;
+      pencil.current?.focus();
+    }
+  }, [draft]);
+
+  function stopEditing() {
+    refocus.current = true;
+    setDraft(null);
+  }
+
+  function saveResponse(e: React.FormEvent) {
+    e.preventDefault();
+    if (!draft) return;
+    stopEditing();
+    onChange({ type: "response", id: g.id, ...draft });
+  }
+
   return (
     <tr
       ref={setNodeRef}
@@ -540,24 +593,143 @@ function GuestRow({
         />
       </td>
       <td />
-      <td className={cell}>
-        <Badge v={answer(g.attending)} />
-      </td>
-      <td className={cell}>
-        <Badge v={party.invited_to_welcome ? answer(g.attending_welcome) : "not invited"} />
-      </td>
-      <td className={cell}>{g.meal ?? ""}</td>
-      <td className={cell}>{g.dietary ?? ""}</td>
-      <td className="px-4 py-2.5 text-right">
-        <button
-          onClick={onRemove}
-          aria-label={`Remove ${who}`}
-          className="px-1 text-lg leading-none text-muted transition hover:text-orange-dark"
-        >
-          ×
-        </button>
+      {draft ? (
+        <ResponseCells
+          formId={formId}
+          draft={draft}
+          welcome={party.invited_to_welcome}
+          who={who}
+          onChange={(patch) => setDraft({ ...draft, ...patch })}
+          onCancel={stopEditing}
+        />
+      ) : (
+        <>
+          <td className={cell}>
+            <Badge v={answer(g.attending)} />
+          </td>
+          <td className={cell}>
+            <Badge v={party.invited_to_welcome ? answer(g.attending_welcome) : "not invited"} />
+          </td>
+          <td className={cell}>{g.meal ?? ""}</td>
+          <td className={cell}>{g.dietary ?? ""}</td>
+        </>
+      )}
+      <td className="whitespace-nowrap px-4 py-2.5 text-right">
+        {draft ? (
+          // The inputs in the cells to the left belong to this form through their `form` attribute.
+          <form id={formId} onSubmit={saveResponse} className="flex justify-end gap-3">
+            <button type="submit" className="rounded-full bg-plum px-4 py-1.5 text-xs uppercase tracking-[0.15em] text-cream hover:bg-ink">
+              Save
+            </button>
+            <button type="button" onClick={stopEditing} className={quietButton}>
+              Cancel
+            </button>
+          </form>
+        ) : (
+          <span className="inline-flex items-center gap-1">
+            <button
+              ref={pencil}
+              type="button"
+              onClick={() => setDraft({ attending: g.attending, attending_welcome: g.attending_welcome, meal: g.meal, dietary: g.dietary })}
+              aria-label={`Edit ${who}'s RSVP`}
+              title="Edit RSVP"
+              className="rounded p-1 text-muted transition hover:text-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+            >
+              <Pencil />
+            </button>
+            <button
+              onClick={onRemove}
+              aria-label={`Remove ${who}`}
+              className="px-1 text-lg leading-none text-muted transition hover:text-orange-dark"
+            >
+              ×
+            </button>
+          </span>
+        )}
       </td>
     </tr>
+  );
+}
+
+/** The Wedding, Welcome drinks, Meal and Dietary cells while editing someone's RSVP. */
+function ResponseCells({
+  formId,
+  draft: d,
+  welcome,
+  who,
+  onChange,
+  onCancel,
+}: {
+  formId: string;
+  draft: Response;
+  welcome: boolean;
+  who: string;
+  onChange: (patch: Partial<Response>) => void;
+  onCancel: () => void;
+}) {
+  const select = `${field} w-auto px-3 py-1`;
+  // Meal and dietary only apply to someone who's coming, as on the RSVP form.
+  const coming = d.attending === true;
+  const keys = (e: React.KeyboardEvent) => e.key === "Escape" && onCancel();
+  const answerSelect = (label: string, value: boolean | null, set: (v: boolean | null) => void, autoFocus = false) => (
+    <select
+      form={formId}
+      aria-label={`${label} for ${who}`}
+      autoFocus={autoFocus}
+      value={answer(value)}
+      onChange={(e) => set(fromAnswer(e.target.value))}
+      onKeyDown={keys}
+      className={select}
+    >
+      <option value="pending">pending</option>
+      <option value="yes">yes</option>
+      <option value="no">no</option>
+    </select>
+  );
+
+  return (
+    <>
+      <td className="px-4 py-2">{answerSelect("Wedding", d.attending, (attending) => onChange({ attending }), true)}</td>
+      <td className="px-4 py-2">
+        {welcome ? (
+          answerSelect("Welcome drinks", d.attending_welcome, (attending_welcome) => onChange({ attending_welcome }))
+        ) : (
+          <Badge v="not invited" />
+        )}
+      </td>
+      <td className="px-4 py-2">
+        <select
+          form={formId}
+          aria-label={`Meal for ${who}`}
+          disabled={!coming}
+          value={coming ? (d.meal ?? "") : ""}
+          onChange={(e) => onChange({ meal: e.target.value || null })}
+          onKeyDown={keys}
+          className={`${select} disabled:opacity-40`}
+        >
+          <option value="">{coming ? "not chosen" : "—"}</option>
+          {mealOptions.map((m) => (
+            <option key={m.value} value={m.value}>
+              {m.value}
+            </option>
+          ))}
+        </select>
+      </td>
+      <td className="px-4 py-2">
+        <input
+          form={formId}
+          aria-label={`Dietary notes for ${who}`}
+          placeholder={coming ? "Dietary notes" : "—"}
+          disabled={!coming}
+          // Same cap as the RSVP form and the server.
+          maxLength={500}
+          value={coming ? (d.dietary ?? "") : ""}
+          onChange={(e) => onChange({ dietary: e.target.value })}
+          onKeyDown={keys}
+          className={`${field} py-1 disabled:opacity-40`}
+        />
+      </td>
+    </>
   );
 }
 

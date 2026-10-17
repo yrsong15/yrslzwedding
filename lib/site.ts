@@ -1,0 +1,157 @@
+// Central place for wedding details and copy. Edit here, not in the pages.
+
+export const couple = {
+  names: "Young Re & Lauren",
+  shortNames: "YR & L",
+  contactEmail: "hello@example.com",
+};
+
+export const weddingDate = new Date("2027-07-24T16:00:00-07:00");
+
+export const weddingDateLabel = "Saturday, July 24, 2027";
+export const location = "Portland, Oregon";
+export const rsvpDeadline = "June 1, 2027";
+
+export const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/rsvp", label: "RSVP" },
+  { href: "/schedule", label: "Schedule" },
+  { href: "/things-to-do", label: "Things to Do" },
+  { href: "/travel", label: "Travel & Lodging" },
+  { href: "/faq", label: "FAQs" },
+  { href: "/registry", label: "Registry" },
+];
+
+// Keep in sync with the CHECK constraint on guests.meal in supabase/schema.sql.
+export const mealOptions = [
+  { value: "beef", label: "Braised short rib" },
+  { value: "fish", label: "Pan-seared salmon" },
+  { value: "vegetarian", label: "Wild mushroom risotto (vegetarian)" },
+] as const;
+
+export type Meal = (typeof mealOptions)[number]["value"];
+
+export const schedule = [
+  {
+    day: "Friday, July 23",
+    events: [
+      {
+        time: "6:00 – 9:00 PM",
+        title: "Welcome Drinks",
+        place: "Wayfinder Beer",
+        address: "304 SE 2nd Ave, Portland, OR 97214",
+        mapUrl: "https://maps.google.com/?q=Wayfinder+Beer+304+SE+2nd+Ave+Portland+OR",
+        description:
+          "Kick off the weekend with us over local beer and bites. Come as you are. Casual attire.",
+      },
+    ],
+  },
+  {
+    day: "Saturday, July 24",
+    events: [
+      {
+        time: "4:00 PM",
+        title: "Ceremony",
+        place: "Venue to be announced",
+        description: "Please arrive 15–20 minutes early to find your seat.",
+      },
+      {
+        time: "5:00 PM",
+        title: "Cocktail Hour",
+        place: "Venue to be announced",
+        description: "Drinks and hors d'oeuvres on the terrace.",
+      },
+      {
+        time: "6:30 PM",
+        title: "Dinner & Dancing",
+        place: "Venue to be announced",
+        description: "Dinner, toasts, and dancing until late.",
+      },
+    ],
+  },
+];
+
+export const hotel = {
+  name: "The Hollis Hotel",
+  neighborhood: "Pearl District",
+  address: "1100 NW Glisan St, Portland, OR 97209",
+  bookingUrl: "https://example.com/hollis-hotel-block",
+  code: "YRLZ2027",
+  cutoff: "June 23, 2027",
+};
+
+export const thingsToDo = [
+  {
+    title: "Powell's City of Books",
+    area: "Pearl District",
+    blurb:
+      "The world's largest independent bookstore fills an entire city block, a short walk from the hotel. Grab a color-coded map and get lost.",
+    url: "https://www.powells.com/",
+  },
+  {
+    title: "Washington Park",
+    area: "West Hills",
+    blurb:
+      "Home to the International Rose Test Garden (10,000+ bushes, peak bloom in summer) and the serene Portland Japanese Garden.",
+    url: "https://explorewashingtonpark.org/",
+  },
+  {
+    title: "Pittock Mansion",
+    area: "West Hills",
+    blurb:
+      "A 1914 French Renaissance-style chateau with sweeping views of the city and, on clear days, Mount Hood.",
+    url: "https://pittockmansion.org/",
+  },
+  {
+    title: "Food carts & breweries",
+    area: "Citywide",
+    blurb:
+      "Portland's food cart pods and craft breweries are legendary. Try the Central Eastside, which is also where Friday's welcome drinks are.",
+    url: "https://www.travelportland.com/",
+  },
+  {
+    title: "Multnomah Falls & the Columbia River Gorge",
+    area: "~30 min east",
+    blurb:
+      "Oregon's tallest waterfall (620 ft) and a stunning scenic drive. Check whether a timed-use permit is required before you go.",
+    url: "https://www.fs.usda.gov/crgnsa",
+  },
+];
+
+export const faqs = [
+  {
+    q: "What should I wear?",
+    a: "Cocktail attire. July in Portland is usually warm and dry, but evenings can cool off, so bring a light layer.",
+  },
+  {
+    q: "Are kids welcome?",
+    a: "We love your little ones! Details coming soon. Your invitation will list everyone we've reserved a seat for.",
+  },
+  {
+    q: "Can I bring a plus-one?",
+    a: "If your invitation includes a guest, you'll see a spot for them when you RSVP.",
+  },
+  {
+    q: "When is the RSVP deadline?",
+    a: `Please RSVP by ${rsvpDeadline} so we can finalize numbers with our caterer.`,
+  },
+  {
+    q: "Is there parking at the venue?",
+    a: "Details coming soon. Portland is very walkable and transit-friendly, and rideshares are easy to find.",
+  },
+];
+
+export const charities = [
+  {
+    name: "The ALS Association",
+    blurb:
+      "Funding research, care services, and advocacy for people living with ALS and their families.",
+    url: "https://www.als.org/donate",
+  },
+  {
+    name: "Brooklyn Bridge Park Conservancy",
+    blurb:
+      "Supporting free programs, public art, and stewardship of the waterfront park we love in New York.",
+    url: "https://brooklynbridgepark.org/support/",
+  },
+];

@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #fbf7f0;
+  --color-linen: #f3ece0;
+  --color-sage: #8a9a7b;
+  --color-sage-dark: #4f5d45;
+  --color-terracotta: #c46a4a;
+  --color-terracotta-dark: #a5543a;
+  --color-ink: #2e2a26;
+  --color-muted: #6b645c;
+
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-jost);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-sage) 35%, transparent);
+}

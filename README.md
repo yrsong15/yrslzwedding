@@ -1,1 +1,59 @@
 # yrslzwedding
+
+Wedding website for Young Re & Lauren — July 24, 2027, Portland, OR.
+
+Next.js (App Router) + Tailwind + Supabase, deployed on Vercel. The whole site sits behind a shared password; RSVPs are stored in Supabase.
+
+## Local development
+
+```bash
+npm install
+cp .env.example .env.local   # then fill in the values
+npm run dev                  # http://localhost:3000
+```
+
+| Variable | Purpose |
+| --- | --- |
+| `SITE_PASSWORD` | Password guests enter to see the site (`nyc` for now) |
+| `ADMIN_PASSWORD` | Separate password for `/admin` (RSVP dashboard) |
+| `SITE_SECRET` | Random string used to sign auth cookies (`openssl rand -hex 32`) |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service-role key (server-only, never expose) |
+
+Changing either password logs everyone out of that area.
+
+## Setting up the database
+
+1. Create a free project at [supabase.com](https://supabase.com) (region: West US / Oregon). When asked about API options:
+   - **Enable Data API:** on (`supabase-js` uses it)
+   - **Automatically expose new tables:** off
+   - **Enable automatic RLS:** on
+2. Open **SQL Editor**, paste in [`supabase/schema.sql`](supabase/schema.sql), and run it. It's safe to re-run. It creates the tables, enables RLS, and grants access to the server role only.
+3. Copy these into `.env.local`:
+   - **Project URL** (from **Connect** or **Project Settings → Data API**) → `SUPABASE_URL`
+   - **Secret key** (`sb_secret_…`, or the legacy `service_role` key, from **Project Settings → API Keys**) → `SUPABASE_SERVICE_ROLE_KEY`
+
+   Don't use the publishable/anon key, which has no access by design. `next dev` reloads `.env.local` automatically.
+4. Build your guest list as `guests.csv` (see [`guests.example.csv`](guests.example.csv)), then run:
+   ```bash
+   npm run import-guests -- guests.csv
+   ```
+   - Rows that share a `party_name` become one invitation, and anyone in the party can RSVP for everyone in it.
+   - Set `is_plus_one=true` with blank names to give a party an unnamed "+1" slot.
+   - Set `invited_to_welcome=false` to hide the Friday welcome-drinks question for that party.
+   - Re-running the import skips parties that already exist.
+
+`guests.csv` is gitignored.
+
+## Reviewing RSVPs
+
+- **`/admin`** (uses `ADMIN_PASSWORD`): headcounts, meal totals, welcome-drinks count, dietary notes, a full guest table, and **Download CSV**.
+- **Supabase dashboard**: the `rsvp_summary` view gives one flat row per guest. The raw `parties` and `guests` tables can be edited directly in the Table Editor.
+
+## Editing content
+
+Almost all copy lives in [`lib/site.ts`](lib/site.ts): names, dates, schedule, hotel, things to do, FAQs, registry links, and meal options. If you change meal options, update the `CHECK` constraint on `guests.meal` in Supabase as well.
+
+## Deploying
+
+Import the repo into [Vercel](https://vercel.com/new), add the environment variables above, and deploy.

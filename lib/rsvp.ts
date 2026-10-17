@@ -82,10 +82,10 @@ export function validateAgainstParty(input: RsvpInput, party: Party): string | n
   for (const g of input.guests) {
     const existing = byId.get(g.id);
     if (!existing) return "Guest does not belong to this party.";
-    if (g.attending && !g.meal) return "Please choose a meal for each attending guest.";
     if (existing.is_plus_one && g.attending && !(g.first_name?.trim() && g.last_name?.trim())) {
-      return "Please enter your guest's name.";
+      return "Please enter your guest's first and last name.";
     }
+    if (g.attending && !g.meal) return "Please choose a meal for each attending guest.";
     if (party.invited_to_welcome && g.attending_welcome === null) {
       return "Please let us know about welcome drinks for each guest.";
     }

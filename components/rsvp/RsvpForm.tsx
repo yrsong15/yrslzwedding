@@ -29,6 +29,15 @@ const toDraft = (g: Guest): Draft => ({
 
 const welcome = schedule[0].events[0];
 
+const hasName = (d: Draft) => Boolean(d.first_name.trim() && d.last_name.trim());
+
+// What to call each plus-one before it has a name: "Your guest", or
+// "Your guest 1", "Your guest 2", … when a party has several.
+function plusOneLabels(drafts: Draft[]): Map<string, string> {
+  const plusOnes = drafts.filter((d) => d.is_plus_one);
+  return new Map(plusOnes.map((d, i) => [d.id, plusOnes.length > 1 ? `Your guest ${i + 1}` : "Your guest"]));
+}
+
 export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p: Party) => void }) {
   const [drafts, setDrafts] = useState<Draft[]>(() => party.guests.map(toDraft));
   const [error, setError] = useState("");
@@ -37,13 +46,17 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
   const update = (id: string, patch: Partial<Draft>) =>
     setDrafts((ds) => ds.map((d) => (d.id === id ? { ...d, ...patch } : d)));
 
+  const labels = plusOneLabels(drafts);
+  // A plus-one goes by its label until both names are filled in.
+  const displayName = (d: Draft) =>
+    d.is_plus_one && !hasName(d) ? labels.get(d.id)! : `${d.first_name.trim()} ${d.last_name.trim()}`;
+
   function clientError(): string | null {
     for (const d of drafts) {
-      const who = d.is_plus_one ? "your guest" : d.first_name;
+      const who = d.is_plus_one ? displayName(d).replace(/^Your/, "your") : d.first_name;
       if (d.attending === null) return `Please let us know if ${who} can make it.`;
+      if (d.is_plus_one && d.attending && !hasName(d)) return `Please enter the first and last name of ${who}.`;
       if (d.attending && !d.meal) return `Please choose a meal for ${who}.`;
-      if (d.is_plus_one && d.attending && !(d.first_name.trim() && d.last_name.trim()))
-        return "Please enter your guest's name.";
       if (party.invited_to_welcome && d.attending_welcome === null)
         return `Please let us know if ${who} will join us for welcome drinks.`;
     }
@@ -97,10 +110,25 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
           transition={{ delay: i * 0.08 }}
           className="rounded-3xl border border-ink/10 bg-white/60 p-6"
         >
-          <legend className="sr-only">{d.is_plus_one ? "Your guest" : `${d.first_name} ${d.last_name}`}</legend>
-          <h3 className="font-serif text-2xl text-ink">
-            {d.is_plus_one ? "Your guest" : `${d.first_name} ${d.last_name}`}
-          </h3>
+          <legend className="sr-only">{displayName(d)}</legend>
+          <h3 className="font-serif text-2xl text-ink">{displayName(d)}</h3>
+
+          {d.is_plus_one && (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <Input
+                label="Guest first name"
+                value={d.first_name}
+                required={d.attending !== false}
+                onChange={(v) => update(d.id, { first_name: v })}
+              />
+              <Input
+                label="Guest last name"
+                value={d.last_name}
+                required={d.attending !== false}
+                onChange={(v) => update(d.id, { last_name: v })}
+              />
+            </div>
+          )}
 
           <Choice
             label="Wedding · Saturday, July 24"
@@ -119,13 +147,6 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
                 className="overflow-hidden"
               >
                 <div className="space-y-5 pt-5">
-                  {d.is_plus_one && (
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Input label="Guest first name" value={d.first_name} onChange={(v) => update(d.id, { first_name: v })} />
-                      <Input label="Guest last name" value={d.last_name} onChange={(v) => update(d.id, { last_name: v })} />
-                    </div>
-                  )}
-
                   <div>
                     <p className="mb-2 text-xs uppercase tracking-[0.2em] text-muted">Dinner</p>
                     <div className="grid gap-2">
@@ -227,13 +248,24 @@ function Choice({
   );
 }
 
-function Input({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function Input({
+  label,
+  value,
+  required,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  required: boolean;
+  onChange: (v: string) => void;
+}) {
   return (
     <label className="block">
       <span className="mb-2 block text-xs uppercase tracking-[0.2em] text-muted">{label}</span>
       <input
         value={value}
         maxLength={80}
+        aria-required={required}
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-xl border border-ink/15 bg-white/70 px-4 py-2.5 outline-none transition focus:border-lavender focus:ring-2 focus:ring-lavender/30"
       />

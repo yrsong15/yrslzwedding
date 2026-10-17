@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import FadeIn from "@/components/FadeIn";
-import { couple, location, rsvpDeadline, weddingDate, weddingDateLabel } from "@/lib/site";
+import { couple, koreanMessage, location, rsvpDeadline, weddingDate, weddingDateLabel } from "@/lib/site";
 
 export default function Home() {
   return (
@@ -20,6 +20,9 @@ export default function Home() {
         <FadeIn delay={0.3}>
           <p className="mt-6 font-serif text-2xl italic text-muted">are getting married</p>
           <div className="mx-auto my-8 h-px w-20 bg-poppy/60" />
+          <p lang="ko" className="mb-6 font-korean text-lg text-plum [word-break:keep-all]">
+            {koreanMessage}
+          </p>
           <p className="text-sm uppercase tracking-[0.3em] text-ink">{weddingDateLabel}</p>
           <p className="mt-2 text-sm uppercase tracking-[0.3em] text-muted">{location}</p>
         </FadeIn>

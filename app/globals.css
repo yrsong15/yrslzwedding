@@ -19,6 +19,7 @@
 @theme inline {
   --font-serif: var(--font-cormorant);
   --font-sans: var(--font-jost);
+  --font-korean: var(--font-noto-serif-kr);
 }
 
 html {

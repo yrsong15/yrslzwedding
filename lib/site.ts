@@ -191,7 +191,7 @@ export const foodAndDrink: { title: string; places: Place[]; footnote?: string }
       { name: "Voodoo Doughnut", tag: "Doughnuts", blurb: "Portland's famously offbeat doughnut shop.", multiple: true },
       { name: "Blue Star Donuts", tag: "Doughnuts", blurb: "Brioche doughnuts in creative flavors.", multiple: true },
       { name: "Pip's Original Doughnuts & Chai", tag: "Doughnuts & chai", blurb: "Tiny made-to-order doughnuts and house-made chai.", multiple: true },
-      { name: "Salt & Straw", tag: "Ice cream", blurb: "Inventive ice cream flavors. They started here in Portland, and we got engaged at one of their NYC shops!", multiple: true },
+      { name: "Salt & Straw", tag: "Ice cream", blurb: "Inventive ice cream flavors. They started here in Portland. Fun fact: we got engaged at one of their NYC shops!", multiple: true },
       { name: "Stumptown Coffee", tag: "Coffee", blurb: "The coffee roaster that also got its start in Portland.", multiple: true },
     ],
   },

@@ -10,7 +10,6 @@ export const weddingDate = new Date("2027-07-24T17:00:00-07:00");
 export const weddingDateLabel = "Saturday, July 24, 2027";
 // Shown at the top of the Home page, above the names. "Lauren and Young Re are making a new start in life together."
 export const koreanMessage = "로렌과 영래가 함께 인생의 새로운 출발을 하려 합니다";
-export const venue = "Ecotrust Building";
 export const location = "Portland, Oregon";
 export const rsvpDeadline = "March 1, 2027";
 

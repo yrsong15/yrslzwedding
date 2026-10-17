@@ -200,7 +200,7 @@ export const foodAndDrink: { title: string; places: Place[]; footnote?: string }
     places: [
       { name: "Scotch Lodge", tag: "Whiskey & cocktails", blurb: "A cozy, whiskey-focused cocktail bar, and the 2026 James Beard Award winner for Outstanding Bar.", map: "Scotch Lodge, 215 SE 9th Ave, Portland, OR" },
       { name: "Wayfinder Beer", tag: "Brewery", blurb: "Where we're hosting Friday's welcome drinks!", map: "Wayfinder Beer, 304 SE 2nd Ave, Portland, OR" },
-      { name: "Hey Love", tag: "Cocktails", blurb: "A cocktail lounge in the Jupiter NEXT hotel.", map: "Hey Love, 920 E Burnside St, Portland, OR" },
+      { name: "Hey Love", tag: "Cocktails", blurb: "A cocktail lounge in the Jupiter NEXT hotel with a ton of fun, quirky cocktails.", map: "Hey Love, 920 E Burnside St, Portland, OR" },
       {
         name: "Deschutes Brewery",
         tag: "Brewery",

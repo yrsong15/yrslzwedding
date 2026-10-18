@@ -2,7 +2,7 @@
 
 export const couple = {
   names: "Lauren & Young Re",
-  contactEmail: "hello@example.com",
+  contactEmail: "wedding@laurenyoungre.com",
 };
 
 // Whose guest an invite is. Admin only: guests never see which side they're on.

@@ -16,7 +16,23 @@ export default function FaqPage() {
                 {f.q}
                 <span className="text-orange-dark transition-transform group-open:rotate-45">+</span>
               </summary>
-              <p className="mt-3 leading-relaxed text-muted">{f.a}</p>
+              <p className="mt-3 leading-relaxed text-muted">
+                {f.a}
+                {"link" in f && f.link && (
+                  <>
+                    {" "}
+                    <a
+                      href={f.link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-orange-dark hover:underline"
+                    >
+                      {f.link.text}
+                    </a>
+                    .
+                  </>
+                )}
+              </p>
             </details>
           </FadeIn>
         ))}

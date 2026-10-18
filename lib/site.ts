@@ -240,6 +240,12 @@ export const faqs = [
     q: "Is there parking at the venue?",
     a: "Details coming soon. Portland is very walkable and transit-friendly, and rideshares are easy to find.",
   },
+  {
+    q: "This isn't a question, but just wanted to say the website looks amazing!",
+    // `link` is rendered after `a` as " <a>text</a>."
+    a: "Thank you, we built the whole thing ourselves from scratch! You can see the source code",
+    link: { text: "here", href: "https://github.com/yrsong15/yrslzwedding" },
+  },
 ];
 
 export const charities = [

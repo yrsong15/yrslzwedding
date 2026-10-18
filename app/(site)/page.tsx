@@ -48,9 +48,14 @@ export default function Home() {
         <FadeIn className="mx-auto max-w-2xl text-center">
           <h2 className="font-serif text-4xl text-plum">Join us in Portland</h2>
           <p className="mt-6 text-lg leading-relaxed text-muted">
-            We can&apos;t wait to celebrate with the people we love most. Look around for the weekend
-            schedule, travel tips, and our favorite things to do in the city, and please let us know
-            if you can make it by <strong className="font-medium text-ink">{rsvpDeadline}</strong>.
+            We can&apos;t wait to celebrate with the people we love most, in Lauren&apos;s hometown
+            (which Young Re might love even more than she does). Please look around for the weekend
+            schedule, travel tips, and our
+            favorite things to do around town.
+          </p>
+          <p className="mt-4 text-lg leading-relaxed text-muted">
+            Kindly let us know if you can make it by{" "}
+            <strong className="font-medium text-ink">{rsvpDeadline}</strong>.
           </p>
         </FadeIn>
       </section>

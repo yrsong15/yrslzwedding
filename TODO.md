@@ -16,6 +16,7 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 
 - [x] **Delete the test data.** Remove The Smith Family, Alex Kim & Guest, and Pat Rivera in the Supabase Table Editor (deleting a party removes its guests). They're currently findable on the live site and counted in `/admin`.
 - [x] **Build `guests.csv`.** Export the Google Sheet as CSV (File → Download → Comma-separated values) with the headers in `guests.example.csv`, then run `npm run import-guests -- guests.csv`. The `invited` column is per person: `yes` lets them RSVP, and blank means not invited until you switch them on in `/admin`. The `side` column is `Lauren` or `Young Re`; it only needs to be on one row per party, and a blank shows as "Not set yet" until you pick a side in `/admin`.
+- [ ] **Replace the `Templatelastname` placeholder.** Tita Min and Uncle Ed have it as their last name, so for now they have to type "Tita Min Templatelastname" to find their invite, and the RSVP form and `/admin` show it. Put in their real last names in `/admin` before invitations go out.
 - [ ] **Test RSVP yourself.** Look up a real name, submit, edit, and check `/admin`.
 
 ## Security

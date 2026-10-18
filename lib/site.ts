@@ -241,11 +241,11 @@ export const faqs = [
   },
   {
     q: "Are kids welcome?",
-    a: "We love your little ones! If your kids are invited, you'll see their names listed with your party when you RSVP. Because space is limited, we kindly ask that only the children named on your RSVP attend. Thank you for understanding!",
+    a: "If your kids are invited, you'll see their names listed with your party when you RSVP. Because space is limited, we kindly ask that only the children named on your RSVP attend. Thank you for understanding!",
   },
   {
     q: "Can I bring a plus-one?",
-    a: "If your invitation includes a guest, you'll see a spot for them when you RSVP.",
+    a: "If your invitation includes a guest, you'll see a spot for them when you RSVP. Because space is limited, we're only able to accommodate the guests named on your invitation. Thank you so much for understanding!",
   },
   {
     q: "When is the RSVP deadline?",

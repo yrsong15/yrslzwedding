@@ -265,7 +265,7 @@ export default function SeatingChart({ parties }: { parties: SeatingParty[] }) {
               </div>
             </div>
             <p className="mt-2 text-center text-xs text-muted">
-              64 × 48 ft, from the venue&apos;s blueprint. The small squares are pillars (to be confirmed). Table placement is
+              64 × 48 ft, from the venue&apos;s blueprint. The small squares are pillars. Table placement is
               temporary.
             </p>
           </div>

@@ -8,7 +8,7 @@ export const seatsPerTable = 8;
 
 export const room = { width: 64, height: 48 };
 
-// Open squares on the blueprint, treated as pillars until the venue confirms.
+// The open squares on the blueprint: pillars.
 export const pillars: { x: number; y: number }[] = [
   { x: 13.3, y: 15.7 },
   { x: 29, y: 15.7 },

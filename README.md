@@ -40,7 +40,7 @@ Build your guest list as `guests.csv` (see [`guests.example.csv`](guests.example
 
 ## Reviewing RSVPs
 
-- **`/admin`** (uses `ADMIN_PASSWORD`): headcounts, meal totals, welcome-drinks count, dietary notes, a full guest table, and **Download CSV**.
+- **`/admin`** (uses `ADMIN_PASSWORD`): the **Invite list** (headcounts, meal totals, welcome-drinks count, dietary notes, a full guest table, and **Download CSV**) and the **Seating chart** (drag parties onto the 23 tables).
 - **Supabase dashboard**: the `rsvp_summary` view gives one flat row per guest. The raw `parties` and `guests` tables can be edited directly in the Table Editor.
 
 ## Editing content

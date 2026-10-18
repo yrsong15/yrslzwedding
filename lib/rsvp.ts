@@ -4,7 +4,8 @@ import { mealOptions } from "./site";
 import { supabase, type Guest, type Party } from "./supabase";
 
 // Guest-facing queries list columns explicitly so the admin-only columns
-// (guests.invited, parties.side, the position columns) never leave the server.
+// (guests.invited, parties.side, parties.table_number, the position columns)
+// never leave the server.
 // Embedded guests are filtered to invited ones and kept in the couple's order.
 const PUBLIC_GUEST_COLUMNS =
   "id, party_id, first_name, last_name, is_plus_one, attending, attending_welcome, meal, dietary, updated_at";

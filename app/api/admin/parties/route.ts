@@ -9,6 +9,7 @@ export async function POST(req: Request) {
 // PATCH { action: "rename", id, name }
 //       { action: "side", id, side }   → whose guest the invite is
 //       { action: "reorder", ids }     → new order of all parties
+//       { action: "table", id, table } → seat the party at a table (null = unseat)
 export async function PATCH(req: Request) {
   return adminMutation(req, partyUpdateSchema, updateParty);
 }

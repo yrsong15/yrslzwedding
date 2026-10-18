@@ -18,6 +18,7 @@ import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, v
 import { CSS } from "@dnd-kit/utilities";
 import { mealOptions, sides } from "@/lib/site";
 import type { AdminGuest, AdminParty, Side } from "@/lib/types";
+import { send } from "./send";
 
 type Draft = { first_name: string; last_name: string; is_plus_one: boolean; invited: boolean };
 
@@ -109,22 +110,6 @@ function requestFor(c: Change): Promise<string | null> {
       const { id, attending, attending_welcome, meal, dietary } = c;
       return send("PATCH", "/api/admin/guests", { action: "response", id, attending, attending_welcome, meal, dietary });
     }
-  }
-}
-
-/** JSON request to an admin route. Returns an error message, or null on success. */
-async function send(method: "POST" | "PATCH" | "DELETE", path: string, body: unknown): Promise<string | null> {
-  try {
-    const res = await fetch(path, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (res.ok) return null;
-    const data = await res.json().catch(() => ({}));
-    return data.error ?? "Something went wrong. Please try again.";
-  } catch {
-    return "Something went wrong. Please try again.";
   }
 }
 

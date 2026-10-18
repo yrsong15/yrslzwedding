@@ -1,3 +1,4 @@
+import Image from "next/image";
 import FadeIn from "@/components/FadeIn";
 import PageHeader from "@/components/PageHeader";
 import { couple, faqs } from "@/lib/site";
@@ -33,6 +34,30 @@ export default function FaqPage() {
                   </>
                 )}
               </p>
+              {"note" in f && f.note && <p className="mt-2 text-sm italic text-muted">{f.note}</p>}
+              {"images" in f && f.images && (
+                <div className="mt-5 flex gap-3 sm:gap-4">
+                  {f.images.map((img) => (
+                    // Each grows in proportion to its aspect ratio, so all end up the same height.
+                    <a
+                      key={img.src}
+                      href={img.src}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ flex: `${img.width / img.height} 1 0%` }}
+                    >
+                      <Image
+                        src={img.src}
+                        width={img.width}
+                        height={img.height}
+                        alt={img.alt}
+                        sizes="(min-width: 672px) 316px, 50vw"
+                        className="h-auto w-full rounded-lg shadow-sm"
+                      />
+                    </a>
+                  ))}
+                </div>
+              )}
             </details>
           </FadeIn>
         ))}

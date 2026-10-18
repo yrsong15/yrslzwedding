@@ -222,7 +222,22 @@ export const foodAndDrink: { title: string; places: Place[]; footnote?: string }
 export const faqs = [
   {
     q: "What should I wear?",
-    a: "Cocktail attire. July in Portland is usually warm and dry, but evenings can cool off, so bring a light layer.",
+    a: "Cocktail attire. Think summer garden: light colors and pastels, flowy florals, and mix-and-match suits. July in Portland is usually warm and dry, but evenings can cool off, so please consider packing a light layer.",
+    note: "We kindly ask that you refrain from wearing jeans or overly casual attire. Thank you!",
+    images: [
+      {
+        src: "/attire/dresses.jpg",
+        width: 1080,
+        height: 1810,
+        alt: "Dresses: think garden! Floral, flowy, midi-gown in length. Pink, yellow, lilac, light blue, and sage floral gowns.",
+      },
+      {
+        src: "/attire/suits.jpg",
+        width: 1179,
+        height: 2094,
+        alt: "Suits: think summer! Light colors, pastels, mix and match. Tan, sage, and light gray suits, beige chinos, and a light blue linen vest.",
+      },
+    ],
   },
   {
     q: "Are kids welcome?",

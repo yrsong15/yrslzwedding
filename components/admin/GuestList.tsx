@@ -202,6 +202,8 @@ export default function GuestList({ parties }: { parties: AdminParty[] }) {
   const [error, setError] = useState("");
   const [adding, setAdding] = useState(false);
   const [filters, setFilters] = useState(noFilters);
+  // Parties start collapsed to their header row; these are the ones opened to show their people.
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [, startTransition] = useTransition();
   // Edits show at once. The refresh that follows runs in the same transition,
   // so nothing flips back while the saved list loads.
@@ -247,6 +249,12 @@ export default function GuestList({ parties }: { parties: AdminParty[] }) {
   const people = rows.reduce((n, r) => n + r.guests.length, 0);
   const set = (patch: Partial<Filters>) => setFilters({ ...filters, ...patch });
   const partyName = (id: UniqueIdentifier) => shown.find((p) => p.id === id)?.name ?? "party";
+  const allOpen = rows.length > 0 && rows.every((r) => expanded.has(r.party.id));
+  function toggle(id: string) {
+    const next = new Set(expanded);
+    if (!next.delete(id)) next.add(id);
+    setExpanded(next);
+  }
 
   return (
     <section className="mt-10">
@@ -285,6 +293,17 @@ export default function GuestList({ parties }: { parties: AdminParty[] }) {
       </div>
       <p className="mt-3 text-sm text-muted">
         {people} {people === 1 ? "person" : "people"} in {rows.length} {rows.length === 1 ? "party" : "parties"}
+        {rows.length > 0 && (
+          <>
+            {" · "}
+            <button
+              onClick={() => setExpanded(allOpen ? new Set() : new Set(rows.map((r) => r.party.id)))}
+              className="underline underline-offset-4 hover:text-orange-dark"
+            >
+              {allOpen ? "Collapse all" : "Expand all"}
+            </button>
+          </>
+        )}
         {draggable ? (
           " · drag the handles to reorder"
         ) : (
@@ -340,6 +359,8 @@ export default function GuestList({ parties }: { parties: AdminParty[] }) {
                   party={party}
                   guests={guests}
                   draggable={draggable}
+                  open={expanded.has(party.id)}
+                  onToggle={() => toggle(party.id)}
                   onChange={change}
                   onRemoveGuest={(g) => removeGuest(g, party)}
                   onRemoveParty={() => removeParty(party)}
@@ -362,6 +383,8 @@ function PartyRows({
   party,
   guests,
   draggable,
+  open,
+  onToggle,
   onChange,
   onRemoveGuest,
   onRemoveParty,
@@ -370,6 +393,9 @@ function PartyRows({
   /** The members that pass the filters (all of them when unfiltered). */
   guests: AdminGuest[];
   draggable: boolean;
+  /** Whether the party's people are shown, or only its header row. */
+  open: boolean;
+  onToggle: () => void;
   onChange: (c: Change) => void;
   onRemoveGuest: (g: AdminGuest) => void;
   onRemoveParty: () => void;
@@ -421,17 +447,30 @@ function PartyRows({
           )}
         </td>
         <td className="px-4 py-2.5">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <EditableText
-              fields={[{ label: "Party name", value: party.name, required: true, width: "w-64" }]}
-              onSave={([name]) => onChange({ type: "rename-party", id: party.id, name })}
-              editLabel={`Rename party: ${party.name}`}
-              display={<span className="font-serif text-xl text-plum">{party.name}</span>}
-            />
-            <span className="whitespace-nowrap text-xs text-muted">
-              {invited} of {total} invited
-              {party.responded_at ? ` · responded ${shortDate(party.responded_at)}` : ""}
-            </span>
+          {/* The chevron sits outside the wrapping line, so a count that wraps lines up under the name. */}
+          <div className="flex items-start gap-2">
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-expanded={open}
+              aria-label={`${open ? "Collapse" : "Expand"} ${party.name}`}
+              title={open ? "Hide people" : "Show people"}
+              className="mt-1 shrink-0 rounded p-1 text-muted transition hover:text-plum focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+            >
+              <Chevron open={open} />
+            </button>
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <EditableText
+                fields={[{ label: "Party name", value: party.name, required: true, width: "w-64" }]}
+                onSave={([name]) => onChange({ type: "rename-party", id: party.id, name })}
+                editLabel={`Rename party: ${party.name}`}
+                display={<span className="font-serif text-xl text-plum">{party.name}</span>}
+              />
+              <span className="whitespace-nowrap text-xs text-muted">
+                {invited} of {total} invited
+                {party.responded_at ? ` · responded ${shortDate(party.responded_at)}` : ""}
+              </span>
+            </div>
           </div>
         </td>
         <td className="px-4 py-2.5">
@@ -455,47 +494,51 @@ function PartyRows({
         </td>
       </tr>
 
-      <DndContext
-        id={`dnd-guests-${party.id}`}
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        modifiers={[verticalOnly]}
-        accessibility={{ container: a11yContainer(), announcements: announcements(who) }}
-        onDragEnd={(e) => {
-          const ids = moved(
-            party.guests.map((g) => g.id),
-            e,
-          );
-          if (ids) onChange({ type: "reorder-guests", partyId: party.id, ids });
-        }}
-      >
-        <SortableContext items={guests.map((g) => g.id)} strategy={verticalListSortingStrategy}>
-          {guests.map((g) => (
-            <GuestRow
-              key={g.id}
-              guest={g}
-              party={party}
-              draggable={draggable}
-              onChange={onChange}
-              onRemove={() => onRemoveGuest(g)}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
+      {open && (
+        <>
+          <DndContext
+            id={`dnd-guests-${party.id}`}
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[verticalOnly]}
+            accessibility={{ container: a11yContainer(), announcements: announcements(who) }}
+            onDragEnd={(e) => {
+              const ids = moved(
+                party.guests.map((g) => g.id),
+                e,
+              );
+              if (ids) onChange({ type: "reorder-guests", partyId: party.id, ids });
+            }}
+          >
+            <SortableContext items={guests.map((g) => g.id)} strategy={verticalListSortingStrategy}>
+              {guests.map((g) => (
+                <GuestRow
+                  key={g.id}
+                  guest={g}
+                  party={party}
+                  draggable={draggable}
+                  onChange={onChange}
+                  onRemove={() => onRemoveGuest(g)}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
 
-      {/* Last line of the party, under its people, so it reads as part of the group. */}
-      <tr>
-        <td colSpan={2} />
-        <td colSpan={7} className={adding ? "px-4 py-3" : "px-4 pb-3 pt-1"}>
-          {adding ? (
-            <AddGuestForm partyId={party.id} onClose={() => setAdding(false)} />
-          ) : (
-            <button onClick={() => setAdding(true)} className={quietButton}>
-              + Add to party
-            </button>
-          )}
-        </td>
-      </tr>
+          {/* Last line of the party, under its people, so it reads as part of the group. */}
+          <tr>
+            <td colSpan={2} />
+            <td colSpan={7} className={adding ? "px-4 py-3" : "px-4 pb-3 pt-1"}>
+              {adding ? (
+                <AddGuestForm partyId={party.id} onClose={() => setAdding(false)} />
+              ) : (
+                <button onClick={() => setAdding(true)} className={quietButton}>
+                  + Add to party
+                </button>
+              )}
+            </td>
+          </tr>
+        </>
+      )}
     </tbody>
   );
 }
@@ -1134,6 +1177,23 @@ function Switch({
         }`}
       />
     </button>
+  );
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      className={`size-4 transition-transform ${open ? "rotate-90" : ""}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m9 6 6 6-6 6" />
+    </svg>
   );
 }
 

@@ -56,6 +56,7 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
     - A plus-one can be renamed to both names or neither.
     - Deleting a party's last person deletes the party.
   - **Edits** show immediately through `useOptimistic`, then `router.refresh()` reloads the server-rendered list and counts in the same transition.
+  - **Collapsed parties:** each party starts as just its header row (name, side, invite count). Its chevron shows the people and "+ Add to party", and "Expand all" / "Collapse all" sits by the count. Which parties are open is client state only and resets on reload.
   - **Dragging** is enabled only with no search, filters, or sort applied.
   - **dnd-kit contexts** have fixed `id`s, so SSR ids match, and render their screen-reader text into `document.body`, so no `<div>` lands inside the table.
 - **Seating chart** (`/admin/seating`, `components/admin/SeatingChart.tsx`): drag parties from the "To seat" list onto 23 round tables of 8 named after national parks (4 Korean, 19 US), or click a name and then a table's **Seat here** (the keyboard and touch way).

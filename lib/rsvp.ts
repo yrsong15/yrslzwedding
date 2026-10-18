@@ -76,18 +76,18 @@ export const rsvpSchema = z.object({
 
 export type RsvpInput = z.infer<typeof rsvpSchema>;
 
+// Plus-ones, and guests on the list with only a first name (the RSVP form
+// shows them as plus-ones), get their names from whoever RSVPs.
+const namedAtRsvp = (g: Guest) => g.is_plus_one || !g.last_name.trim();
+
 /** Returns an error message, or null if the submission is valid for this party. */
 export function validateAgainstParty(input: RsvpInput, party: Party): string | null {
   const byId = new Map(party.guests.map((g) => [g.id, g]));
   for (const g of input.guests) {
     const existing = byId.get(g.id);
     if (!existing) return "Guest does not belong to this party.";
-    if (existing.is_plus_one && g.attending && !(g.first_name?.trim() && g.last_name?.trim())) {
+    if (namedAtRsvp(existing) && g.attending && !(g.first_name?.trim() && g.last_name?.trim())) {
       return "Please enter your guest's first and last name.";
-    }
-    // Someone on the list with only a first name gives a last name if they're coming.
-    if (!existing.is_plus_one && !existing.last_name.trim() && g.attending && !g.last_name?.trim()) {
-      return "Please enter the last name of each guest who's coming.";
     }
     if (g.attending && !g.meal) return "Please choose a meal for each attending guest.";
     if (party.invited_to_welcome && g.attending && g.attending_welcome === null) {
@@ -116,9 +116,11 @@ export async function saveRsvp(input: RsvpInput, party: Party): Promise<void> {
     if (existing.is_plus_one) {
       update.first_name = g.attending ? (g.first_name ?? "").trim() : "";
       update.last_name = g.attending ? (g.last_name ?? "").trim() : "";
-    } else if (!existing.last_name.trim() && g.last_name?.trim()) {
-      // Fill in a missing last name, but never change a name the couple entered.
-      update.last_name = g.last_name.trim();
+    } else if (namedAtRsvp(existing) && g.attending) {
+      // A first-name-only guest gets their full name, but a "no" keeps the
+      // first name the couple entered.
+      update.first_name = (g.first_name ?? "").trim();
+      update.last_name = (g.last_name ?? "").trim();
     }
     const { error } = await db.from("guests").update(update).eq("id", g.id).eq("party_id", party.id);
     if (error) throw error;

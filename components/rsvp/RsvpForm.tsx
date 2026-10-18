@@ -8,8 +8,6 @@ import { mealOptions, schedule } from "@/lib/site";
 type Draft = {
   id: string;
   is_plus_one: boolean;
-  // A guest on the list with only a first name, asked for a last name.
-  needs_last_name: boolean;
   first_name: string;
   last_name: string;
   attending: boolean | null;
@@ -20,8 +18,9 @@ type Draft = {
 
 const toDraft = (g: Guest): Draft => ({
   id: g.id,
-  is_plus_one: g.is_plus_one,
-  needs_last_name: !g.is_plus_one && !g.last_name.trim(),
+  // Someone on the list with only a first name is shown as a plus-one, so
+  // whoever RSVPs fills in their full name (the first name starts filled in).
+  is_plus_one: g.is_plus_one || !g.last_name.trim(),
   first_name: g.first_name,
   last_name: g.last_name,
   attending: g.attending,
@@ -52,14 +51,13 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
   const labels = plusOneLabels(drafts);
   // A plus-one goes by its label until both names are filled in.
   const displayName = (d: Draft) =>
-    d.is_plus_one && !hasName(d) ? labels.get(d.id)! : `${d.first_name.trim()} ${d.last_name.trim()}`.trim();
+    d.is_plus_one && !hasName(d) ? labels.get(d.id)! : `${d.first_name.trim()} ${d.last_name.trim()}`;
 
   function clientError(): string | null {
     for (const d of drafts) {
       const who = d.is_plus_one ? displayName(d).replace(/^Your/, "your") : d.first_name;
       if (d.attending === null) return `Please let us know if ${who} can make it.`;
       if (d.is_plus_one && d.attending && !hasName(d)) return `Please enter the first and last name of ${who}.`;
-      if (d.needs_last_name && d.attending && !d.last_name.trim()) return `Please enter ${d.first_name.trim()}'s last name.`;
       if (d.attending && !d.meal) return `Please choose a meal for ${who}.`;
       if (party.invited_to_welcome && d.attending && d.attending_welcome === null)
         return `Please let us know if ${who} will join us for welcome drinks.`;
@@ -87,7 +85,6 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
             meal: d.attending ? d.meal : null,
             dietary: d.attending ? d.dietary : null,
             ...(d.is_plus_one && { first_name: d.first_name, last_name: d.last_name }),
-            ...(d.needs_last_name && { last_name: d.last_name }),
           })),
         }),
       });
@@ -129,17 +126,6 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
               />
               <Input
                 label="Guest last name"
-                value={d.last_name}
-                required={d.attending !== false}
-                onChange={(v) => update(d.id, { last_name: v })}
-              />
-            </div>
-          )}
-
-          {d.needs_last_name && (
-            <div className="mt-5 sm:w-1/2 sm:pr-1.5">
-              <Input
-                label="Last name"
                 value={d.last_name}
                 required={d.attending !== false}
                 onChange={(v) => update(d.id, { last_name: v })}

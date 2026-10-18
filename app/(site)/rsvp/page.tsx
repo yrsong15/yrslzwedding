@@ -1,6 +1,6 @@
 import PageHeader from "@/components/PageHeader";
 import RsvpFlow from "@/components/rsvp/RsvpFlow";
-import { rsvpDeadline } from "@/lib/site";
+import { couple, rsvpDeadline } from "@/lib/site";
 
 export const metadata = { title: "RSVP" };
 
@@ -14,6 +14,13 @@ export default function RsvpPage() {
       />
       <div className="mx-auto max-w-2xl px-4">
         <RsvpFlow />
+        <p className="mt-12 text-center text-muted">
+          Any questions? Email us at{" "}
+          <a href={`mailto:${couple.contactEmail}`} className="text-orange-dark hover:underline">
+            {couple.contactEmail}
+          </a>
+          .
+        </p>
       </div>
     </div>
   );

@@ -18,10 +18,10 @@ type Draft = {
 
 const toDraft = (g: Guest): Draft => ({
   id: g.id,
-  // Someone on the list with only a first name is shown as a plus-one, so
-  // whoever RSVPs fills in their full name (the first name starts filled in).
+  // Someone on the list with only a first name is shown as a blank plus-one,
+  // so whoever RSVPs types in both their first and last name.
   is_plus_one: g.is_plus_one || !g.last_name.trim(),
-  first_name: g.first_name,
+  first_name: g.last_name.trim() ? g.first_name : "",
   last_name: g.last_name,
   attending: g.attending,
   attending_welcome: g.attending_welcome,

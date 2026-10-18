@@ -78,7 +78,7 @@ export const rsvpSchema = z.object({
 export type RsvpInput = z.infer<typeof rsvpSchema>;
 
 // Plus-ones, and guests on the list with only a first name (the RSVP form
-// shows them as plus-ones), get their names from whoever RSVPs.
+// shows them as blank plus-ones), get their full names from whoever RSVPs.
 const namedAtRsvp = (g: Guest) => g.is_plus_one || !g.last_name.trim();
 
 /** Returns an error message, or null if the submission is valid for this party. */

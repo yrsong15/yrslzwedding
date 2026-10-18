@@ -241,9 +241,9 @@ export const faqs = [
     a: "Details coming soon. Portland is very walkable and transit-friendly, and rideshares are easy to find.",
   },
   {
-    q: "This isn't a question, but just wanted to say the website looks amazing!",
+    q: "The website looks amazing!",
     // `link` is rendered after `a` as " <a>text</a>."
-    a: "Thank you, we built the whole thing ourselves from scratch! You can see the source code",
+    a: "I don't think there's a question here, but thank you! We built the whole thing ourselves from scratch, you can see the source code",
     link: { text: "here", href: "https://github.com/yrsong15/yrslzwedding" },
   },
 ];

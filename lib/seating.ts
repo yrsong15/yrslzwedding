@@ -64,7 +64,7 @@ export const seatingTables: { number: number; name: string; ko?: string; x: numb
   { number: 16, name: "Rocky Mountain", x: 34.6, y: 14.8 },
   { number: 17, name: "Great Smoky Mountains", x: 49.1, y: 10.7 },
   { number: 18, name: "Bryce Canyon", x: 59.3, y: 16.5 },
-  { number: 19, name: "Sequoia", x: 4.8, y: 4.7 },
+  { number: 19, name: "Badlands", x: 4.8, y: 4.7 },
   { number: 20, name: "Denali", x: 16, y: 5.4 },
   { number: 21, name: "Bukhansan", ko: "북한산", x: 28.3, y: 4.6 },
   { number: 22, name: "Redwood", x: 39.5, y: 4.8 },

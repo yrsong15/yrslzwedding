@@ -62,13 +62,13 @@ export const seatingTables: { number: number; name: string; ko?: string; x: numb
   { number: 14, name: "Seoraksan", ko: "설악산", x: 5, y: 15.8 },
   { number: 15, name: "Grand Teton", x: 22.9, y: 14.4 },
   { number: 16, name: "Rocky Mountain", x: 34.6, y: 14.8 },
-  { number: 17, name: "Great Smoky Mountains", x: 49.1, y: 10.7 },
+  { number: 17, name: "Shenandoah", x: 49.1, y: 10.7 },
   { number: 18, name: "Bryce Canyon", x: 59.3, y: 16.5 },
   { number: 19, name: "Badlands", x: 4.8, y: 4.7 },
   { number: 20, name: "Denali", x: 16, y: 5.4 },
   { number: 21, name: "Bukhansan", ko: "북한산", x: 28.3, y: 4.6 },
   { number: 22, name: "Redwood", x: 39.5, y: 4.8 },
-  { number: 23, name: "Haleakalā", x: 58.8, y: 4.9 },
+  { number: 23, name: "Hawaiʻi Volcanoes", x: 58.8, y: 4.9 },
 ];
 
 export const tableName = (n: number) => seatingTables.find((t) => t.number === n)?.name ?? `Table ${n}`;

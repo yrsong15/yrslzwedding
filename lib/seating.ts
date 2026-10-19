@@ -4,6 +4,7 @@
 // Everything is in feet, from the room's top-left inside corner (x to the
 // right, y down), measured off the venue's blueprint (about 10.7 px per ft).
 
+// Matches the CHECK constraint on guests.seat in supabase/schema.sql: change one, change both.
 export const seatsPerTable = 8;
 
 export const room = { width: 64, height: 48 };
@@ -69,6 +70,49 @@ export const tableName = (n: number) => seatingTables.find((t) => t.number === n
 
 /** Who needs a seat: anyone invited who hasn't said no. */
 export const takesSeat = (g: { invited: boolean; attending: boolean | null }) => g.invited && g.attending !== false;
+
+type Sitter = { id: string; seat: number | null };
+
+/**
+ * Who sits where at one table: a seat number for each person, given the people
+ * there who need a seat, party by party in the couple's saved order. Seats are
+ * numbered 1 to 8 clockwise from the top. A saved seat holds unless someone
+ * earlier already has it, which only a hand edit in the database should cause.
+ * Everyone else takes free seats (say, someone who declined, lost their seat,
+ * and then said yes again), a party side by side where it can. A table over 8 gives the extras seats 9 and up, which aren't saved.
+ * Shared by the chart and the server, so both arrive at the same seats.
+ */
+export function arrangeTable(parties: { guests: Sitter[] }[]): Map<string, number> {
+  const ring = Math.max(seatsPerTable, parties.reduce((n, p) => n + p.guests.length, 0));
+  const at = new Map<string, number>();
+  const taken = new Set<number>();
+  const take = (id: string, seat: number) => (taken.add(seat), at.set(id, seat));
+  for (const p of parties) {
+    for (const g of p.guests) if (g.seat !== null && g.seat <= seatsPerTable && !taken.has(g.seat)) take(g.id, g.seat);
+  }
+  const wrap = (seat: number) => ((seat - 1) % ring) + 1;
+  const seatNumbers = Array.from({ length: ring }, (_, i) => i + 1);
+  for (const p of parties) {
+    const left = p.guests.filter((g) => !at.has(g.id));
+    if (left.length === 0) continue;
+    // The first run of free seats that fits all of them, or else any free seats.
+    const start = seatNumbers.find((s) => left.every((_, j) => !taken.has(wrap(s + j))));
+    left.forEach((g, j) => take(g.id, start ? wrap(start + j) : seatNumbers.find((s) => !taken.has(s))!));
+  }
+  return at;
+}
+
+/** Everyone's seat at a table after one person moves to `seat`, swapping with whoever sat there. */
+export function moveWithinTable(parties: { guests: Sitter[] }[], guestId: string, seat: number): Map<string, number> {
+  const at = arrangeTable(parties);
+  const from = at.get(guestId);
+  if (from === undefined) return at;
+  for (const [id, n] of at) if (n === seat) at.set(id, from);
+  return at.set(guestId, seat);
+}
+
+/** A seat as saved: the extras at a table over 8 have none. */
+export const savedSeat = (seat: number | undefined) => (seat !== undefined && seat <= seatsPerTable ? seat : null);
 
 /** Shared by the chart and the server, so the wording matches. */
 export function noRoomMessage(partyName: string, needed: number, table: number, left: number): string {

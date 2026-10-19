@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ADMIN_COOKIE, verifyToken } from "./auth";
-import { noRoomMessage, seatingTables, seatsPerTable, takesSeat } from "./seating";
+import { arrangeTable, moveWithinTable, noRoomMessage, savedSeat, seatingTables, seatsPerTable, takesSeat } from "./seating";
 import { mealOptions } from "./site";
 import { supabase } from "./supabase";
 import type { AdminParty, SeatingParty } from "./types";
@@ -61,7 +61,9 @@ export async function getSeatingList(): Promise<SeatingParty[]> {
       name: p.name,
       side: p.side,
       table_number: p.table_number,
-      guests: p.guests.filter(takesSeat).map(({ id, first_name, last_name, is_plus_one }) => ({ id, first_name, last_name, is_plus_one })),
+      guests: p.guests
+        .filter(takesSeat)
+        .map(({ id, first_name, last_name, is_plus_one, seat }) => ({ id, first_name, last_name, is_plus_one, seat })),
     }))
     .filter((p) => p.guests.length > 0);
 }
@@ -92,6 +94,8 @@ export const guestUpdateSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("invite"), ids: z.array(uuid).min(1).max(100), invited: z.boolean() }),
   z.object({ action: z.literal("rename"), id: uuid, first_name: firstName, last_name: lastName }),
   z.object({ action: z.literal("reorder"), partyId: uuid, ids: z.array(uuid).min(1).max(100) }),
+  // Move someone to another seat at their party's table.
+  z.object({ action: z.literal("seat"), id: uuid, seat: z.number().int().min(1).max(seatsPerTable) }),
   // null = no answer yet, like on the RSVP form.
   z.object({
     action: z.literal("response"),
@@ -172,9 +176,11 @@ export async function updateGuests(input: z.infer<typeof guestUpdateSchema>): Pr
   const db = supabase();
   switch (input.action) {
     case "invite": {
-      const { data, error } = await db.from("guests").update({ invited: input.invited }).in("id", input.ids).select("party_id");
+      // Un-invited people give up their seats.
+      const update = input.invited ? { invited: true } : { invited: false, seat: null };
+      const { data, error } = await db.from("guests").update(update).in("id", input.ids).select("party_id");
       if (error) throw error;
-      if (!input.invited) await unseatUninvited(data.map((g) => g.party_id));
+      if (!input.invited) await unseatEmpty(data.map((g) => g.party_id));
       return null;
     }
     case "rename": {
@@ -195,6 +201,8 @@ export async function updateGuests(input: z.infer<typeof guestUpdateSchema>): Pr
       if (error) throw error;
       return null;
     }
+    case "seat":
+      return seatGuest(input.id, input.seat);
     case "response":
       return setResponse(input);
   }
@@ -230,6 +238,8 @@ async function setResponse(input: Extract<z.infer<typeof guestUpdateSchema>, { a
       meal: attending ? input.meal : null,
       dietary: attending ? input.dietary?.trim() || null : null,
       updated_at: answered ? now : null,
+      // A "no" gives up their seat, as on the RSVP form.
+      ...(attending === false && { seat: null }),
     })
     .eq("id", input.id);
   if (error) throw error;
@@ -248,6 +258,7 @@ async function setResponse(input: Extract<z.infer<typeof guestUpdateSchema>, { a
     const { error: rErr } = await db.from("parties").update({ responded_at }).eq("id", guest.party_id);
     if (rErr) throw rErr;
   }
+  if (attending === false) await unseatEmpty([guest.party_id]);
   return null;
 }
 
@@ -277,45 +288,102 @@ export async function updateParty(input: z.infer<typeof partyUpdateSchema>): Pro
   }
 }
 
+type TableParty = {
+  id: string;
+  name: string;
+  table_number: number | null;
+  guests: { id: string; seat: number | null; invited: boolean; attending: boolean | null }[];
+};
+
+/** The parties at a table (plus one more party, if given), in the couple's saved order, as the chart has them. */
+async function partiesAt(table: number, alsoId?: string): Promise<TableParty[]> {
+  const query = supabase().from("parties").select("id, name, table_number, guests(id, seat, invited, attending)");
+  const { data, error } = await (alsoId ? query.or(`id.eq.${alsoId},table_number.eq.${table}`) : query.eq("table_number", table))
+    .order("position")
+    .order("position", { referencedTable: "guests" });
+  if (error) throw error;
+  return data as TableParty[];
+}
+
+/** Only the people who need a seat, the way the chart sees a table. */
+const sitters = (parties: TableParty[]) => parties.map((p) => ({ guests: p.guests.filter(takesSeat) }));
+
+/** Save seats (null clears one) in one call. */
+async function saveSeats(seats: Map<string, number | null>): Promise<void> {
+  if (seats.size === 0) return;
+  const { error } = await supabase().rpc("set_seats", { ids: [...seats.keys()], seats: [...seats.values()] });
+  if (error) throw error;
+}
+
 /**
  * Put a party at a table (null takes it off the chart). Refuses if the people
- * in it who need a seat don't fit in what's left, as the chart does.
+ * in it who need a seat don't fit in what's left, as the chart does. Its people
+ * take free seats there, side by side where they can.
  */
 async function seatParty(id: string, table: number | null): Promise<string | null> {
   const db = supabase();
-  if (table !== null) {
-    const { data, error } = await db
-      .from("parties")
-      .select("id, name, table_number, guests(invited, attending)")
-      .or(`id.eq.${id},table_number.eq.${table}`);
+  if (table === null) {
+    const { error } = await db.from("parties").update({ table_number: null }).eq("id", id);
     if (error) throw error;
-    const party = data.find((p) => p.id === id);
-    if (!party) return "That party no longer exists.";
-    if (party.table_number === table) return null;
-    const needed = party.guests.filter(takesSeat).length;
-    if (needed === 0) return `No one in ${party.name} needs a seat.`;
-    const taken = data
-      .filter((p) => p.id !== id)
-      .reduce((n, p) => n + p.guests.filter(takesSeat).length, 0);
-    if (needed > seatsPerTable - taken) return noRoomMessage(party.name, needed, table, seatsPerTable - taken);
+    const { error: sErr } = await db.from("guests").update({ seat: null }).eq("party_id", id);
+    if (sErr) throw sErr;
+    return null;
   }
+
+  const parties = await partiesAt(table, id);
+  const party = parties.find((p) => p.id === id);
+  if (!party) return "That party no longer exists.";
+  if (party.table_number === table) return null;
+  const needed = party.guests.filter(takesSeat).length;
+  if (needed === 0) return `No one in ${party.name} needs a seat.`;
+  const taken = parties
+    .filter((p) => p.id !== id)
+    .reduce((n, p) => n + p.guests.filter(takesSeat).length, 0);
+  if (needed > seatsPerTable - taken) return noRoomMessage(party.name, needed, table, seatsPerTable - taken);
+
   const { error } = await db.from("parties").update({ table_number: table }).eq("id", id);
   if (error) throw error;
+  // Their seats at the old table mean nothing here. Saving everyone's seats
+  // keeps the people already at this table where the chart showed them.
+  for (const g of party.guests) g.seat = null;
+  const at = arrangeTable(sitters(parties));
+  await saveSeats(new Map(parties.flatMap((p) => p.guests.map((g) => [g.id, savedSeat(at.get(g.id))]))));
   return null;
 }
 
-/** Take parties off the seating chart once nobody in them is invited. */
-async function unseatUninvited(partyIds: string[]): Promise<void> {
+/** Move someone to another seat at their party's table, swapping with whoever sits there. */
+async function seatGuest(id: string, seat: number): Promise<string | null> {
+  const db = supabase();
+  const { data: guest, error: gErr } = await db.from("guests").select("party_id, invited, attending").eq("id", id).maybeSingle();
+  if (gErr) throw gErr;
+  if (!guest) return "That person no longer exists.";
+  if (!takesSeat(guest)) return "They don't need a seat.";
+  const { data: party, error: pErr } = await db.from("parties").select("table_number").eq("id", guest.party_id).single();
+  if (pErr) throw pErr;
+  if (party.table_number === null) return "Seat their party at a table first.";
+  const at = moveWithinTable(sitters(await partiesAt(party.table_number)), id, seat);
+  await saveSeats(new Map([...at].map(([gid, n]) => [gid, savedSeat(n)])));
+  return null;
+}
+
+/**
+ * Take parties off the seating chart once nobody in them needs a seat (they all
+ * declined, were un-invited, or were deleted). Seated again later, they take
+ * whatever table has room.
+ */
+async function unseatEmpty(partyIds: string[]): Promise<void> {
   const ids = [...new Set(partyIds)];
   if (ids.length === 0) return;
   const db = supabase();
-  const { data, error } = await db.from("guests").select("party_id").in("party_id", ids).eq("invited", true);
+  const { data, error } = await db.from("guests").select("party_id, invited, attending").in("party_id", ids);
   if (error) throw error;
-  const stillInvited = new Set(data.map((g) => g.party_id));
-  const empty = ids.filter((id) => !stillInvited.has(id));
+  const sitting = new Set(data.filter(takesSeat).map((g) => g.party_id));
+  const empty = ids.filter((id) => !sitting.has(id));
   if (empty.length === 0) return;
   const { error: uErr } = await db.from("parties").update({ table_number: null }).in("id", empty);
   if (uErr) throw uErr;
+  const { error: sErr } = await db.from("guests").update({ seat: null }).in("party_id", empty);
+  if (sErr) throw sErr;
 }
 
 /** Delete a guest, and their party too if they were its last member. */
@@ -335,8 +403,8 @@ export async function deleteGuest(id: string): Promise<null> {
     const { error: pErr } = await db.from("parties").delete().eq("id", guest.party_id);
     if (pErr) throw pErr;
   } else {
-    // Deleting the last invited person is like un-inviting them.
-    await unseatUninvited([guest.party_id]);
+    // Deleting the last person who needs a seat is like un-inviting them.
+    await unseatEmpty([guest.party_id]);
   }
   return null;
 }

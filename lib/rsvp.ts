@@ -2,9 +2,10 @@ import "server-only";
 import { z } from "zod";
 import { mealOptions } from "./site";
 import { supabase, type Guest, type Party } from "./supabase";
+import type { AdminGuest } from "./types";
 
 // Guest-facing queries list columns explicitly so the admin-only columns
-// (guests.invited, parties.side, parties.table_number, the position columns)
+// (guests.invited, guests.seat, parties.side, parties.table_number, the position columns)
 // never leave the server.
 // Embedded guests are filtered to invited ones and kept in the couple's order.
 const PUBLIC_GUEST_COLUMNS =
@@ -105,13 +106,16 @@ export async function saveRsvp(input: RsvpInput, party: Party): Promise<void> {
   const byId = new Map(party.guests.map((g) => [g.id, g]));
 
   for (const g of input.guests) {
-    const update: Partial<Guest> = {
+    // Writes the admin-only seat but never reads it back.
+    const update: Partial<AdminGuest> = {
       attending: g.attending,
       // Nobody comes to welcome drinks without the wedding, so a "no" covers both.
       attending_welcome: party.invited_to_welcome ? g.attending && g.attending_welcome : null,
       meal: g.attending ? g.meal : null,
       dietary: g.attending ? g.dietary?.trim() || null : null,
       updated_at: now,
+      // A "no" gives up their seat on the seating chart.
+      ...(!g.attending && { seat: null }),
     };
     const existing = byId.get(g.id)!;
     if (existing.is_plus_one) {
@@ -127,7 +131,13 @@ export async function saveRsvp(input: RsvpInput, party: Party): Promise<void> {
     if (error) throw error;
   }
 
-  const { error } = await db.from("parties").update({ responded_at: now }).eq("id", party.id);
+  // A party where nobody's coming loses its table on the seating chart (its
+  // seats went with each "no" above). These are all its invited guests.
+  const nobodyComing = input.guests.every((g) => !g.attending);
+  const { error } = await db
+    .from("parties")
+    .update({ responded_at: now, ...(nobodyComing && { table_number: null }) })
+    .eq("id", party.id);
   if (error) throw error;
 }
 

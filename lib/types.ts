@@ -21,10 +21,14 @@ export type Party = {
   guests: Guest[];
 };
 
-// Admin-only shapes. `invited`, `side` and `table_number` are deliberately
-// missing from the public Guest and Party above: guest-facing code must never
-// send them.
-export type AdminGuest = Guest & { invited: boolean };
+// Admin-only shapes. `invited`, `seat`, `side` and `table_number` are
+// deliberately missing from the public Guest and Party above: guest-facing code
+// must never send them.
+export type AdminGuest = Guest & {
+  invited: boolean;
+  /** Seat at the party's table, 1 to 8 clockwise from the top, or null to let the chart pick. */
+  seat: number | null;
+};
 
 /** Whose guest an invite is. */
 export type Side = "lauren" | "young_re";
@@ -42,5 +46,5 @@ export type SeatingParty = {
   name: string;
   side: Side | null;
   table_number: number | null;
-  guests: Pick<Guest, "id" | "first_name" | "last_name" | "is_plus_one">[];
+  guests: Pick<AdminGuest, "id" | "first_name" | "last_name" | "is_plus_one" | "seat">[];
 };

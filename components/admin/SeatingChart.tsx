@@ -756,8 +756,9 @@ function Room() {
           <path d={`M${doors.x1} ${H} v${leaf} A${leaf} ${leaf} 0 0 0 ${mid} ${H}`} />
           <path d={`M${doors.x2} ${H} v${leaf} A${leaf} ${leaf} 0 0 1 ${mid} ${H}`} />
         </g>
+        {/* Dark brown, outside the site's palette, so the pillars read as part of the building. */}
         {pillars.map((p) => (
-          <rect key={`${p.x},${p.y}`} x={p.x - 0.6} y={p.y - 0.6} width={1.2} height={1.2} className="fill-white stroke-ink/50" strokeWidth={0.12} />
+          <rect key={`${p.x},${p.y}`} x={p.x - 0.6} y={p.y - 0.6} width={1.2} height={1.2} className="fill-[#5b3a29]" />
         ))}
       </svg>
       <span

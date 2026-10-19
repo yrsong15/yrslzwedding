@@ -72,7 +72,6 @@ Build your guest list as `guests.csv` (see [`guests.example.csv`](guests.example
 
 `guests.csv` is gitignored.
 
-
 ## Editing content
 
 Almost all copy lives in [`lib/site.ts`](lib/site.ts):

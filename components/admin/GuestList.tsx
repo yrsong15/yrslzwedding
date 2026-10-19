@@ -16,8 +16,10 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { cardSentMessage } from "@/lib/cards";
 import { mealOptions, sides } from "@/lib/site";
 import type { AdminGuest, AdminParty, Side } from "@/lib/types";
+import { Picker, Switch, normName, shortDate } from "./controls";
 import { send } from "./send";
 
 type Draft = { first_name: string; last_name: string; is_plus_one: boolean; invited: boolean };
@@ -119,11 +121,6 @@ const guestName = (g: AdminGuest) => (g.is_plus_one && !g.first_name ? null : `$
 const answer = (v: boolean | null) => (v === null ? "pending" : v ? "yes" : "no");
 const fromAnswer = (s: string) => (s === "yes" ? true : s === "no" ? false : null);
 
-const normName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
-
-// Fixed locale and zone so the server render and hydration agree.
-const shortDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", { month: "numeric", day: "numeric", timeZone: "America/Los_Angeles" });
 
 type Filters = {
   query: string;
@@ -221,13 +218,20 @@ export default function GuestList({ parties }: { parties: AdminParty[] }) {
     });
   }
 
-  const change = (c: Change) =>
+  function change(c: Change) {
+    // Once a party's invite card has gone out, nobody invited in it can be un-invited (the server checks too).
+    if (c.type === "invite" && !c.invited) {
+      const locked = shown.find((p) => p.card_sent_at && p.guests.some((g) => g.invited && c.ids.includes(g.id)));
+      if (locked) return alert(cardSentMessage(locked.name));
+    }
     save(
       () => requestFor(c),
       () => show(c),
     );
+  }
 
   function removeGuest(g: AdminGuest, party: AdminParty) {
+    if (g.invited && party.card_sent_at) return alert(cardSentMessage(party.name));
     const name = guestName(g);
     const lines = [name ? `Remove ${name}?` : `Remove the plus-one from ${party.name}?`];
     if (g.attending !== null) lines.push("They've already RSVP'd, and their answers will be deleted too.");
@@ -236,6 +240,7 @@ export default function GuestList({ parties }: { parties: AdminParty[] }) {
   }
 
   function removeParty(party: AdminParty) {
+    if (party.card_sent_at) return alert(cardSentMessage(party.name));
     const n = party.guests.length;
     const people = n === 0 ? "" : ` and its ${n === 1 ? "1 person" : `${n} people`}`;
     if (confirm(`Delete ${party.name}${people}? This can't be undone.`)) {
@@ -468,6 +473,7 @@ function PartyRows({
               />
               <span className="whitespace-nowrap text-xs text-muted">
                 {invited} of {total} invited
+                {party.card_sent_at ? ` · card sent ${shortDate(party.card_sent_at)}` : ""}
                 {party.responded_at ? ` · responded ${shortDate(party.responded_at)}` : ""}
               </span>
             </div>
@@ -928,35 +934,6 @@ function SideToggle({ value, partyName, onChange }: { value: Side | null; partyN
   );
 }
 
-function Picker<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: T;
-  options: [T, string][];
-  onChange: (v: T) => void;
-}) {
-  return (
-    <label className="flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-muted">
-      {label}
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as T)}
-        className="rounded-full border border-ink/20 bg-white/70 px-3 py-1.5 text-sm normal-case tracking-normal text-ink outline-none transition focus:border-lavender focus:ring-2 focus:ring-lavender/30"
-      >
-        {options.map(([v, text]) => (
-          <option key={v} value={v}>
-            {text}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
 /** Add one person to an existing party. */
 function AddGuestForm({ partyId, onClose }: { partyId: string; onClose: () => void }) {
   const router = useRouter();
@@ -1143,40 +1120,6 @@ function GuestFields({
         </button>
       )}
     </div>
-  );
-}
-
-function Switch({
-  checked,
-  onClick,
-  label,
-  tristate = false,
-}: {
-  checked: boolean | "mixed";
-  onClick: () => void;
-  label: string;
-  tristate?: boolean;
-}) {
-  const on = checked === true;
-  return (
-    <button
-      type="button"
-      // A party can be partly invited, which only the checkbox role can express.
-      role={tristate ? "checkbox" : "switch"}
-      aria-checked={checked}
-      aria-label={label}
-      onClick={onClick}
-      className={`inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender focus-visible:ring-offset-2 focus-visible:ring-offset-cream ${
-        on ? "bg-plum" : checked === "mixed" ? "bg-lavender" : "bg-ink/20"
-      }`}
-    >
-      <span
-        aria-hidden
-        className={`size-5 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none ${
-          on ? "translate-x-5.5" : checked === "mixed" ? "translate-x-3" : "translate-x-0.5"
-        }`}
-      />
-    </button>
   );
 }
 

@@ -10,6 +10,7 @@ export async function POST(req: Request) {
 //       { action: "side", id, side }   → whose guest the invite is
 //       { action: "reorder", ids }     → new order of all parties
 //       { action: "table", id, table } → seat the party at a table (null = unseat)
+//       { action: "card", id, sent }   → mark the invite card as sent or not
 export async function PATCH(req: Request) {
   return adminMutation(req, partyUpdateSchema, updateParty);
 }

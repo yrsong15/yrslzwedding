@@ -13,7 +13,7 @@ export default async function AdminPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 pb-24">
       <PageHeader title="Admin" />
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
         {adminSections.map((s) => (
           <Link
             key={s.href}

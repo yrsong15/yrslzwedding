@@ -12,6 +12,10 @@ create table if not exists parties (
   -- be split across tables. Admin-only. The range matches seatingTables in
   -- lib/seating.ts: change one, change both.
   table_number smallint check (table_number between 1 and 23),
+  -- When the paper invite card was marked as sent (null = not yet). Only for
+  -- parties with someone invited, and while set, nobody invited in the party can
+  -- be un-invited or deleted. Admin-only.
+  card_sent_at timestamptz,
   notes text,
   responded_at timestamptz,
   created_at timestamptz not null default now()

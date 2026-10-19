@@ -3,6 +3,7 @@ import AdminTabs from "@/components/admin/AdminTabs";
 import GuestList from "@/components/admin/GuestList";
 import PageHeader from "@/components/PageHeader";
 import { getGuestList, isAdmin } from "@/lib/admin";
+import { invitedParty } from "@/lib/cards";
 import { mealOptions, sides } from "@/lib/site";
 import type { AdminParty, Side } from "@/lib/types";
 
@@ -30,7 +31,7 @@ export default async function InvitesPage() {
   const real = invited.filter((r) => !(r.is_plus_one && r.attending !== true));
   const count = (pred: (r: (typeof real)[number]) => boolean) => real.filter(pred).length;
   const attending = real.filter((r) => r.attending === true);
-  const invitedParties = parties.filter((p) => p.guests.some((g) => g.invited));
+  const invitedParties = parties.filter(invitedParty);
   const respondedParties = invitedParties.filter((p) => p.responded_at);
   const plusOnes = invited.filter((r) => r.is_plus_one).length;
 

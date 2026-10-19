@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ADMIN_COOKIE, verifyToken } from "./auth";
+import { cardSentMessage, invitedParty } from "./cards";
 import { arrangeTable, moveWithinTable, noRoomMessage, savedSeat, seatingTables, seatsPerTable, takesSeat } from "./seating";
 import { mealOptions } from "./site";
 import { supabase } from "./supabase";
@@ -46,7 +47,7 @@ export function toCsv(rows: SummaryRow[]): string {
 export async function getGuestList(): Promise<AdminParty[]> {
   const { data, error } = await supabase()
     .from("parties")
-    .select("id, name, invited_to_welcome, responded_at, side, table_number, guests(*)")
+    .select("id, name, invited_to_welcome, responded_at, side, table_number, card_sent_at, guests(*)")
     .order("position")
     .order("position", { referencedTable: "guests" });
   if (error) throw error;
@@ -113,6 +114,8 @@ export const partyUpdateSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("reorder"), ids: z.array(uuid).min(1).max(2000) }),
   // null = take the party off the seating chart.
   z.object({ action: z.literal("table"), id: uuid, table: z.number().int().min(1).max(seatingTables.length).nullable() }),
+  // Whether the party's paper invite card has gone out.
+  z.object({ action: z.literal("card"), id: uuid, sent: z.boolean() }),
 ]);
 
 const NAME_REQUIRED = "Please enter a first and last name (or tick Plus-one).";
@@ -176,6 +179,10 @@ export async function updateGuests(input: z.infer<typeof guestUpdateSchema>): Pr
   const db = supabase();
   switch (input.action) {
     case "invite": {
+      if (!input.invited) {
+        const locked = await cardLock(input.ids);
+        if (locked) return locked;
+      }
       // Un-invited people give up their seats.
       const update = input.invited ? { invited: true } : { invited: false, seat: null };
       const { data, error } = await db.from("guests").update(update).in("id", input.ids).select("party_id");
@@ -285,7 +292,39 @@ export async function updateParty(input: z.infer<typeof partyUpdateSchema>): Pro
     }
     case "table":
       return seatParty(input.id, input.table);
+    case "card":
+      return setCardSent(input.id, input.sent);
   }
+}
+
+/** Mark a party's invite card as sent (keeping the first date) or not sent. Only invited parties get one. */
+async function setCardSent(id: string, sent: boolean): Promise<string | null> {
+  const db = supabase();
+  if (!sent) {
+    const { error } = await db.from("parties").update({ card_sent_at: null }).eq("id", id);
+    if (error) throw error;
+    return null;
+  }
+  const { data: party, error: pErr } = await db.from("parties").select("guests(invited)").eq("id", id).maybeSingle();
+  if (pErr) throw pErr;
+  if (!party) return "That party no longer exists.";
+  if (!invitedParty(party as { guests: { invited: boolean }[] })) return "Only invited parties get a card.";
+  const { error } = await db.from("parties").update({ card_sent_at: new Date().toISOString() }).eq("id", id).is("card_sent_at", null);
+  if (error) throw error;
+  return null;
+}
+
+/**
+ * The warning if any of these people is invited in a party whose card has gone
+ * out (so they can't be un-invited or deleted), or null.
+ */
+async function cardLock(guestIds: string[]): Promise<string | null> {
+  const { data, error } = await supabase().from("guests").select("invited, parties(name, card_sent_at)").in("id", guestIds);
+  if (error) throw error;
+  const locked = (data as unknown as { invited: boolean; parties: { name: string; card_sent_at: string | null } }[]).find(
+    (g) => g.invited && g.parties.card_sent_at,
+  );
+  return locked ? cardSentMessage(locked.parties.name) : null;
 }
 
 type TableParty = {
@@ -387,11 +426,13 @@ async function unseatEmpty(partyIds: string[]): Promise<void> {
 }
 
 /** Delete a guest, and their party too if they were its last member. */
-export async function deleteGuest(id: string): Promise<null> {
+export async function deleteGuest(id: string): Promise<string | null> {
   const db = supabase();
   const { data: guest, error: gErr } = await db.from("guests").select("party_id").eq("id", id).maybeSingle();
   if (gErr) throw gErr;
   if (!guest) return null;
+  const locked = await cardLock([id]);
+  if (locked) return locked;
   const { error } = await db.from("guests").delete().eq("id", id);
   if (error) throw error;
   const { count, error: cErr } = await db
@@ -409,9 +450,14 @@ export async function deleteGuest(id: string): Promise<null> {
   return null;
 }
 
-/** Delete a party; its guests go with it (on delete cascade). */
-export async function deleteParty(id: string): Promise<null> {
-  const { error } = await supabase().from("parties").delete().eq("id", id);
+/** Delete a party; its guests go with it (on delete cascade). Not once its invite card has gone out. */
+export async function deleteParty(id: string): Promise<string | null> {
+  const db = supabase();
+  const { data: party, error: pErr } = await db.from("parties").select("name, card_sent_at").eq("id", id).maybeSingle();
+  if (pErr) throw pErr;
+  if (!party) return null;
+  if (party.card_sent_at) return cardSentMessage(party.name);
+  const { error } = await db.from("parties").delete().eq("id", id);
   if (error) throw error;
   return null;
 }

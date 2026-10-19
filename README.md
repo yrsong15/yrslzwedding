@@ -33,7 +33,7 @@ Build your guest list as `guests.csv` (see [`guests.example.csv`](guests.example
    - Rows that share a `party_name` become one invitation, and anyone in the party can RSVP for everyone in it.
    - Set `is_plus_one=true` with blank names to give a party an unnamed "+1" slot.
    - A guest with only a first name (e.g. a partner whose last name you don't know) shows up on the RSVP form as a blank "+1", and whoever RSVPs enters both their first and last name. Name such parties like "Alex Kim and +1".
-   - Set `invited_to_welcome=false` to hide the Friday welcome-drinks question for that party.
+   - Every party is invited to the Friday welcome drinks.
    - Re-running the import skips parties that already exist.
 
 `guests.csv` is gitignored.

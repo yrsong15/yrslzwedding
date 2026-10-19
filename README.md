@@ -11,7 +11,7 @@ Next.js (App Router) + Tailwind + Supabase, deployed on Vercel. The whole site s
 | What | Link |
 | --- | --- |
 | Live site | https://laurenyoungre.com |
-| RSVP dashboard (admin password) | https://laurenyoungre.com/admin |
+| Admin: RSVPs, invite cards, seating (admin password) | https://laurenyoungre.com/admin |
 | Vercel (deployments, env vars, domains) | https://vercel.com/dashboard → `yrslzwedding` |
 | Supabase project | https://supabase.com/dashboard/project/advualgyombhyhipussb |
 | Supabase Table Editor (guests & RSVPs) | https://supabase.com/dashboard/project/advualgyombhyhipussb/editor |
@@ -38,10 +38,39 @@ Build your guest list as `guests.csv` (see [`guests.example.csv`](guests.example
 
 `guests.csv` is gitignored.
 
-## Reviewing RSVPs
+## The guest site
 
-- **`/admin`** (uses `ADMIN_PASSWORD`): the **Invite list** (headcounts, meal totals, welcome-drinks count, dietary notes, a full guest table, and **Download CSV**) and the **Seating chart** (drag parties onto the 23 tables, and people between seats at their table).
-- **Supabase dashboard**: the `rsvp_summary` view gives one flat row per guest. The raw `parties` and `guests` tables can be edited directly in the Table Editor.
+Guests enter the shared guest password once, and then can browse every page. Each nav tab shows its Korean name when you hover over it on a laptop, and the phone menu always shows both names.
+
+- **Home**: the date, the place, a message in Korean, and a countdown to the wedding.
+- **RSVP**: guests search for their name as it appears on the invitation, and only invited guests come up. One person answers for their whole party:
+  - whether each person is coming
+  - welcome drinks on Friday
+  - a meal choice and dietary notes for each person
+  - names for any plus-ones
+
+  They can come back later to see or change their answers.
+- **Schedule**: the weekend's events.
+- **Things to Do**: sights around Portland, plus the couple's favorite restaurants, cafés, and bars, with map links.
+- **Travel & Lodging**: getting to Portland and where to stay.
+- **FAQs**: dress code, parking, and other common questions.
+- **Registry**: no gifts, please; instead, a few charities to donate to.
+
+## Admin
+
+The site has a separate admin section at [`/admin`](https://laurenyoungre.com/admin). It isn't linked from the site's nav, and it has its own password (`ADMIN_PASSWORD`), separate from the guest password. It has three pages:
+
+- **Invite list**: the RSVP dashboard and the full guest list.
+  - Totals: invited, attending, declined, and pending; welcome drinks; guests by side; meal counts; and everyone's dietary notes.
+  - Invite or un-invite people or whole parties. Only invited guests can find themselves on the RSVP page.
+  - Set whose guests each party is (Lauren's or Young Re's).
+  - Add, rename, reorder, and delete people and parties.
+  - Enter or correct someone's RSVP, e.g. for an answer given by phone.
+  - Search and filter the list, and download it as a CSV.
+- **Invite cards**: check off each invited party once its paper invitation is in the mail, with a count of how many are still to send. Once a party's card is marked sent, nobody invited in it can be un-invited or deleted, until the card is marked not sent again.
+- **Seating chart**: a to-scale plan of the reception room with 23 tables of 8. Drag parties onto tables, then people between seats at their table. A party always sits together, and anyone who declines or is un-invited gives up their seat.
+
+For anything the admin pages don't cover, the Supabase dashboard has the raw `parties` and `guests` tables (editable in the Table Editor) and the `rsvp_summary` view, which gives one flat row per guest.
 
 ## Editing content
 

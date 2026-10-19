@@ -46,7 +46,7 @@ type Spot = { table: number; seat: number | null };
 
 // Drawing sizes in feet, like the room (lib/seating.ts). Seats sit on an
 // ellipse, taller than wide, so the pills above and below a table clear the
-// ones beside them. The widest pill keeps side-by-side tables (10.2 ft apart at
+// ones beside them. The widest pill keeps side-by-side tables (11.2 ft apart at
 // the closest) from touching, and the table is drawn a little under its real
 // 5 ft so the pills beside it have room.
 const CHAIRS_X = 3.35;

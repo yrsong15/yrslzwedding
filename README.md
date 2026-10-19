@@ -25,19 +25,6 @@ cp .env.example .env.local    # then fill in the values
 npm run dev                   # http://localhost:3000
 ```
 
-## Setting up the database
-Build your guest list as `guests.csv` (see [`guests.example.csv`](guests.example.csv)), then run:
-   ```bash
-   npm run import-guests -- guests.csv
-   ```
-   - Rows that share a `party_name` become one invitation, and anyone in the party can RSVP for everyone in it.
-   - Set `is_plus_one=true` with blank names to give a party an unnamed "+1" slot.
-   - A guest with only a first name (e.g. a partner whose last name you don't know) shows up on the RSVP form as a blank "+1", and whoever RSVPs enters both their first and last name. Name such parties like "Alex Kim and +1".
-   - Every party is invited to the Friday welcome drinks.
-   - Re-running the import skips parties that already exist.
-
-`guests.csv` is gitignored.
-
 ## The guest site
 
 Guests enter the shared guest password once, and then can browse every page. Each nav tab shows its Korean name when you hover over it on a laptop, and the phone menu always shows both names.
@@ -72,6 +59,20 @@ The site has a separate admin section at [`/admin`](https://laurenyoungre.com/ad
 
 For anything the admin pages don't cover, the Supabase dashboard has the raw `parties` and `guests` tables (editable in the Table Editor) and the `rsvp_summary` view, which gives one flat row per guest.
 
+## Setting up the database
+Build your guest list as `guests.csv` (see [`guests.example.csv`](guests.example.csv)), then run:
+   ```bash
+   npm run import-guests -- guests.csv
+   ```
+   - Rows that share a `party_name` become one invitation, and anyone in the party can RSVP for everyone in it.
+   - Set `is_plus_one=true` with blank names to give a party an unnamed "+1" slot.
+   - A guest with only a first name (e.g. a partner whose last name you don't know) shows up on the RSVP form as a blank "+1", and whoever RSVPs enters both their first and last name. Name such parties like "Alex Kim and +1".
+   - Every party is invited to the Friday welcome drinks.
+   - Re-running the import skips parties that already exist.
+
+`guests.csv` is gitignored.
+
+
 ## Editing content
 
 Almost all copy lives in [`lib/site.ts`](lib/site.ts):
@@ -86,7 +87,7 @@ If you change meal options, update the `CHECK` constraint on `guests.meal` in Su
 
 ## Deploying
 
-Already deployed. Every push to `main` redeploys automatically.
+Every push to `main` redeploys automatically.
 
 To set it up again from scratch, import the repo into [Vercel](https://vercel.com/new), paste in your `.env.local` contents as the environment variables (the names are in [`.env.example`](.env.example)), and deploy. Skip Vercel's Supabase integration, which can replace your Supabase settings with a new, empty project.
 

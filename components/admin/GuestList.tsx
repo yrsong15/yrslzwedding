@@ -977,7 +977,6 @@ function AddPartyForm({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [side, setSide] = useState<Side | null>(null);
-  const [welcome, setWelcome] = useState(true);
   const [guests, setGuests] = useState<Draft[]>(() => [emptyDraft()]);
   const [error, setError] = useState("");
   const [saving, startSaving] = useTransition();
@@ -987,7 +986,7 @@ function AddPartyForm({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     setError("");
     startSaving(async () => {
-      const problem = await send("POST", "/api/admin/parties", { name, side, invited_to_welcome: welcome, guests });
+      const problem = await send("POST", "/api/admin/parties", { name, side, guests });
       if (problem) return setError(problem);
       startSaving(() => {
         onClose();
@@ -1037,10 +1036,6 @@ function AddPartyForm({ onClose }: { onClose: () => void }) {
             </label>
           ))}
         </div>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={welcome} onChange={(e) => setWelcome(e.target.checked)} className="accent-plum" />
-          Invited to welcome drinks
-        </label>
       </div>
       <div className="flex flex-wrap items-center gap-4">
         <button type="submit" disabled={saving} className={darkButton}>

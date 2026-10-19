@@ -86,7 +86,6 @@ export const addGuestSchema = z.object({ partyId: uuid, ...guestFields });
 export const addPartySchema = z.object({
   name: partyName,
   side,
-  invited_to_welcome: z.boolean(),
   guests: z.array(z.object(guestFields)).min(1).max(30),
 });
 export const idSchema = z.object({ id: uuid });
@@ -138,7 +137,10 @@ async function duplicatePartyName(name: string, exceptId?: string): Promise<stri
   return data.length > 0 ? `There's already a party called "${name}".` : null;
 }
 
-/** Create a party with its guests. One guest and no name makes a party of one, named after them. */
+/**
+ * Create a party with its guests, invited to welcome drinks like everyone. One
+ * guest and no name makes a party of one, named after them.
+ */
 export async function addParty(input: z.infer<typeof addPartySchema>): Promise<string | null> {
   if (input.guests.some(missingName)) return NAME_REQUIRED;
   const [first] = input.guests;
@@ -151,7 +153,7 @@ export async function addParty(input: z.infer<typeof addPartySchema>): Promise<s
   const db = supabase();
   const { data: party, error: pErr } = await db
     .from("parties")
-    .insert({ name, side: input.side, invited_to_welcome: input.invited_to_welcome })
+    .insert({ name, side: input.side, invited_to_welcome: true })
     .select("id")
     .single();
   if (pErr) throw pErr;

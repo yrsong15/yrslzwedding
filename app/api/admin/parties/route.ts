@@ -1,7 +1,7 @@
 import { addParty, addPartySchema, adminMutation, deleteParty, idSchema, partyUpdateSchema, updateParty } from "@/lib/admin";
 
-// POST { name, side, invited_to_welcome, guests[] } → create a party. A blank
-// name with one guest makes a party of one, named after them.
+// POST { name, side, guests[] } → create a party, invited to welcome drinks. A
+// blank name with one guest makes a party of one, named after them.
 export async function POST(req: Request) {
   return adminMutation(req, addPartySchema, addParty);
 }

@@ -18,6 +18,21 @@ export const weddingDateLabel = "Saturday, July 24, 2027";
 // Shown at the top of the Home page, above the names. "Lauren and Young Re are making a new start in life together."
 export const koreanMessage = "로렌과 영래가 함께 인생의 새로운 출발을 하려 합니다";
 export const location = "Portland, Oregon";
+
+// Korean for the /password page, which pairs every English line with Korean
+// for guests who read only one of the two. The date stays English only.
+export const passwordPageKo = {
+  title: "로렌과 영래",
+  invite: "귀하를 로렌과 영래의 결혼식에 초대합니다", // "We invite you to Lauren and Young Re's wedding."
+  prompt: "초대장에 적힌 비밀번호를 입력해 주세요.",
+  form: {
+    placeholder: "비밀번호",
+    enter: "입장",
+    checking: "확인 중…",
+    wrongPassword: "비밀번호가 맞지 않습니다. 다시 입력해 주세요.",
+    error: "문제가 발생했습니다. 다시 시도해 주세요.",
+  },
+};
 export const rsvpDeadline = "March 1, 2027";
 
 // `ko` is shown when a tab is hovered, focused, or pressed (see components/Nav.tsx).

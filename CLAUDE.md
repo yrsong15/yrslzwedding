@@ -22,6 +22,7 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
   - schedule, hotel
   - Sights (`thingsToDo`) and food & drink (`foodAndDrink`)
   - FAQs, charities, and meal options
+  - the `/password` page's Korean (`passwordPageKo`). That page is bilingual for guests who read only English or only Korean, so every line has a Korean pair except the date. `PasswordForm` shows Korean only when given `ko`, so the admin login stays English only.
 
   Exceptions written directly in the page files: `PageHeader` intros (e.g. the Registry's no-gifts text) and the Travel page's airport tips.
 - **Food & drink entries** (`foodAndDrink`): a single-location place gets `map` (name + address, turned into a Google Maps search link). A place with several locations gets `multiple: true` and no link. Pho Van is deliberately a `map` entry pointing at its original 82nd Ave location. Javelina's query is name-only because the restaurant moved in 2025.

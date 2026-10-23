@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import PasswordForm from "@/components/PasswordForm";
-import { couple, weddingDateLabel, location } from "@/lib/site";
+import { couple, weddingDateLabel, location, passwordPageKo } from "@/lib/site";
 
 function Gate() {
   const router = useRouter();
@@ -15,6 +15,7 @@ function Gate() {
 
   return (
     <PasswordForm
+      ko={passwordPageKo.form}
       onSuccess={() => {
         router.replace(dest);
         router.refresh();
@@ -34,11 +35,17 @@ export default function PasswordPage() {
       >
         <p className="text-xs uppercase tracking-[0.35em] text-lavender">Welcome to the wedding of</p>
         <h1 className="mt-4 font-serif text-5xl text-plum sm:text-6xl">{couple.names}</h1>
+        <p lang="ko" className="mx-auto mt-4 max-w-[22em] font-korean text-base text-lavender text-balance [word-break:keep-all]">
+          {passwordPageKo.invite}
+        </p>
         <p className="mt-4 font-serif text-xl italic text-muted">
           {weddingDateLabel} · {location}
         </p>
         <div className="mx-auto my-8 h-px w-16 bg-orange/70" />
-        <p className="mb-6 text-sm text-muted">Please enter the password from your invitation.</p>
+        <p className="text-sm text-muted">Please enter the password from your invitation.</p>
+        <p lang="ko" className="mb-6 mt-1 font-korean text-[0.8125rem] text-muted [word-break:keep-all]">
+          {passwordPageKo.prompt}
+        </p>
         <Suspense>
           <Gate />
         </Suspense>

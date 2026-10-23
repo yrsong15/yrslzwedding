@@ -3,6 +3,10 @@
 
 export const SITE_COOKIE = "site_auth";
 export const ADMIN_COOKIE = "admin_auth";
+// Which of the couple is using this device, so each keeps their own unread
+// notifications. Not a security boundary: anyone with the admin password can
+// pick either name.
+export const ADMIN_WHO_COOKIE = "admin_who";
 export const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 type Scope = "site" | "admin";

@@ -1,8 +1,9 @@
 import "server-only";
 import { z } from "zod";
+import { diffParty } from "./notifications";
 import { mealOptions } from "./site";
 import { supabase, type Guest, type Party } from "./supabase";
-import type { AdminGuest } from "./types";
+import type { AdminGuest, RsvpNotification } from "./types";
 
 // Guest-facing queries list columns explicitly so the admin-only columns
 // (guests.invited, guests.seat, parties.side, parties.table_number, the position columns)
@@ -74,6 +75,8 @@ export const rsvpSchema = z.object({
       }),
     )
     .min(1),
+  // The name they looked the invite up by, for the couple's notifications.
+  respondent: z.string().trim().max(200).optional(),
 });
 
 export type RsvpInput = z.infer<typeof rsvpSchema>;
@@ -151,4 +154,36 @@ export async function clearRsvp(party: Party): Promise<void> {
   if (error) throw error;
   const { error: pErr } = await db.from("parties").update({ responded_at: null }).eq("id", party.id);
   if (pErr) throw pErr;
+}
+
+/**
+ * Save a notification for the couple of what a guest's RSVP save or clear
+ * changed, if anything. `respondent` is kept only if it's the name of someone
+ * in the party, so guests can't put arbitrary text there. Never throws: the
+ * RSVP itself is already saved, and a guest shouldn't see it fail over this.
+ */
+export async function recordRsvpChange(
+  before: Party,
+  after: Party | null,
+  kind: RsvpNotification["kind"],
+  respondent: string | undefined,
+): Promise<void> {
+  try {
+    const changes = diffParty(before, after);
+    if (changes.length === 0) return;
+    const target = respondent ? normName(respondent) : "";
+    const who = before.guests.find((g) => !g.is_plus_one && target && normName(`${g.first_name} ${g.last_name}`) === target);
+    const { error } = await supabase()
+      .from("rsvp_notifications")
+      .insert({
+        party_id: before.id,
+        party_name: before.name,
+        respondent: who ? `${who.first_name} ${who.last_name}`.trim() : null,
+        kind,
+        changes,
+      });
+    if (error) throw error;
+  } catch (e) {
+    console.error("RSVP notification failed", e);
+  }
 }

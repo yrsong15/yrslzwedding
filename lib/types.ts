@@ -52,6 +52,48 @@ export type CardParty = {
   guests: (string | null)[];
 };
 
+/** One answer that changed. Raw values: meal is the option value, booleans are yes/no, null is no answer. */
+export type FieldChange = {
+  field: "name" | "attending" | "attending_welcome" | "meal" | "dietary";
+  from: string | boolean | null;
+  to: string | boolean | null;
+};
+
+/** What changed for one person in a party. Names are as they were then. */
+export type GuestChange = {
+  guest_id: string;
+  /** Their name, or "" for a plus-one who hasn't been named. */
+  name: string;
+  /** A plus-one, or someone on the list with only a first name (the RSVP form treats them the same). */
+  plus_one: boolean;
+  /** Whose plus-one: the party's only other guest, or null if it has several. */
+  host: string | null;
+  changes: FieldChange[];
+};
+
+/** A guest's change to their party's RSVP, for the bell and the notifications page. Admin only. */
+export type RsvpNotification = {
+  id: string;
+  party_id: string | null;
+  party_name: string;
+  /** Who looked the invite up, if their name matched someone in the party. */
+  respondent: string | null;
+  /** First answers, a change to earlier ones, or "start over" on the RSVP page. */
+  kind: "new" | "updated" | "cleared";
+  changes: GuestChange[];
+  created_at: string;
+};
+
+/** What the bell shows. Admin only. */
+export type BellData = {
+  /** Which of the couple is checking on this device, or null if they haven't said. */
+  who: Side | null;
+  /** How many notifications are new to them: the first `unread` of `items` (all of them, if more). */
+  unread: number;
+  /** The latest notifications, newest first. */
+  items: RsvpNotification[];
+};
+
 /** A party on the seating chart, with only the people who need a seat. Admin only. */
 export type SeatingParty = {
   id: string;

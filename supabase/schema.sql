@@ -46,10 +46,39 @@ create table if not exists guests (
 create index if not exists guests_party_id_idx on guests (party_id);
 create index if not exists guests_name_idx on guests (lower(first_name), lower(last_name));
 
+-- One row per guest RSVP change (submit, edit, or clear), for the bell in
+-- /admin. Names are snapshots, so the history survives renames and deletes.
+-- Admin-only.
+create table if not exists rsvp_notifications (
+  id uuid primary key default gen_random_uuid(),
+  party_id uuid references parties (id) on delete set null,
+  party_name text not null,
+  -- The name they looked up, if it matched someone in the party.
+  respondent text,
+  kind text not null check (kind in ('new', 'updated', 'cleared')),
+  -- [{ guest_id, name, changes: [{ field, from, to }] }]: GuestChange[] in lib/types.ts.
+  changes jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists rsvp_notifications_created_at_idx on rsvp_notifications (created_at desc);
+create index if not exists rsvp_notifications_party_id_idx on rsvp_notifications (party_id);
+
+-- How far each of the couple has read the notifications. The bell's badge
+-- counts what's newer than bell_seen_at; the notifications page highlights
+-- what's newer than list_seen_at. Admin-only.
+create table if not exists admin_seen (
+  person text primary key check (person in ('lauren', 'young_re')),
+  bell_seen_at timestamptz,
+  list_seen_at timestamptz
+);
+
 -- The site talks to the DB only through server routes using the service-role
 -- key, which bypasses RLS. Enabling RLS with no policies blocks the anon key.
 alter table parties enable row level security;
 alter table guests enable row level security;
+alter table rsvp_notifications enable row level security;
+alter table admin_seen enable row level security;
 
 -- One flat row per guest: easy to read in the Table Editor or export to CSV.
 -- security_invoker makes the view respect RLS instead of running as its owner.
@@ -94,15 +123,32 @@ create or replace function set_seats(ids uuid[], seats smallint[]) returns void
     from unnest(ids, seats) as t(id, seat) where guests.id = t.id;
 $$;
 
+-- Mark everything up to a notification as seen by one of the couple. Takes the
+-- notification's id rather than a timestamp, so its exact created_at
+-- (microseconds) never passes through JavaScript's millisecond Date.
+-- greatest() keeps a stale tab from un-reading newer ones.
+create or replace function mark_notifications_seen(who text, upto uuid, list boolean) returns void
+  language sql set search_path = '' as $$
+  insert into public.admin_seen as s (person, bell_seen_at, list_seen_at)
+  select who, n.created_at, case when list then n.created_at end
+    from public.rsvp_notifications n where n.id = upto
+  on conflict (person) do update set
+    bell_seen_at = greatest(s.bell_seen_at, excluded.bell_seen_at),
+    list_seen_at = greatest(s.list_seen_at, excluded.list_seen_at);
+$$;
+
 -- Only the server (service_role) may touch these. Explicit so it works whether
 -- or not "Automatically expose new tables" is enabled in the project. New
 -- functions are executable by PUBLIC unless revoked.
-revoke all on parties, guests, rsvp_summary from anon, authenticated;
-grant select, insert, update, delete on parties, guests to service_role;
+revoke all on parties, guests, rsvp_summary, rsvp_notifications, admin_seen from anon, authenticated;
+grant select, insert, update, delete on parties, guests, admin_seen to service_role;
 grant select on rsvp_summary to service_role;
-revoke execute on function reorder_parties(uuid[]), reorder_guests(uuid, uuid[]), set_seats(uuid[], smallint[])
+grant select, insert, delete on rsvp_notifications to service_role;
+revoke execute on function reorder_parties(uuid[]), reorder_guests(uuid, uuid[]), set_seats(uuid[], smallint[]),
+  mark_notifications_seen(text, uuid, boolean)
   from public, anon, authenticated;
-grant execute on function reorder_parties(uuid[]), reorder_guests(uuid, uuid[]), set_seats(uuid[], smallint[]) to service_role;
+grant execute on function reorder_parties(uuid[]), reorder_guests(uuid, uuid[]), set_seats(uuid[], smallint[]),
+  mark_notifications_seen(text, uuid, boolean) to service_role;
 
 -- Example data (delete once you import your real list):
 -- with p as (insert into parties (name) values ('Test Family') returning id)

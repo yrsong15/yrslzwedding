@@ -23,13 +23,16 @@ const slide = {
 
 export default function RsvpFlow() {
   const [step, setStep] = useState<Step>({ kind: "lookup" });
+  // The name they searched for, so the couple's notifications say who responded.
+  const [respondent, setRespondent] = useState("");
 
   return (
     <AnimatePresence mode="wait">
       {step.kind === "lookup" && (
         <motion.div key="lookup" {...slide}>
           <Lookup
-            onFound={(parties) => {
+            onFound={(parties, name) => {
+              setRespondent(name);
               if (parties.length === 1) setStep(stepFor(parties[0]));
               else setStep({ kind: "choose", parties });
             }}
@@ -58,7 +61,7 @@ export default function RsvpFlow() {
 
       {step.kind === "form" && (
         <motion.div key="form" {...slide}>
-          <RsvpForm party={step.party} onSaved={(party) => setStep({ kind: "done", party })} />
+          <RsvpForm party={step.party} respondent={respondent} onSaved={(party) => setStep({ kind: "done", party })} />
           <BackLink onClick={() => setStep({ kind: "lookup" })} label="Not you? Search again" />
         </motion.div>
       )}
@@ -67,6 +70,7 @@ export default function RsvpFlow() {
         <motion.div key="done" {...slide}>
           <RsvpSummary
             party={step.party}
+            respondent={respondent}
             onEdit={() => setStep({ kind: "form", party: step.party })}
             onCleared={(party) => setStep({ kind: "form", party })}
           />
@@ -87,7 +91,7 @@ function BackLink({ onClick, label = "← Back to search" }: { onClick: () => vo
   );
 }
 
-function Lookup({ onFound }: { onFound: (parties: Party[]) => void }) {
+function Lookup({ onFound }: { onFound: (parties: Party[], name: string) => void }) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -107,7 +111,7 @@ function Lookup({ onFound }: { onFound: (parties: Party[]) => void }) {
           `Hmm, we couldn't find that name. Try it exactly as it appears on your invitation, or email us at ${couple.contactEmail}.`,
         );
       }
-      onFound(data.parties);
+      onFound(data.parties, q);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

@@ -2,15 +2,63 @@ import "server-only";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { ADMIN_COOKIE, verifyToken } from "./auth";
+import { ADMIN_COOKIE, ADMIN_WHO_COOKIE, verifyToken } from "./auth";
 import { cardSentMessage, invitedParty } from "./cards";
 import { arrangeTable, moveWithinTable, noRoomMessage, savedSeat, seatingTables, seatsPerTable, takesSeat } from "./seating";
-import { mealOptions } from "./site";
+import { mealOptions, sides } from "./site";
 import { supabase } from "./supabase";
-import type { AdminParty, SeatingParty } from "./types";
+import type { AdminParty, BellData, RsvpNotification, SeatingParty, Side } from "./types";
 
 export async function isAdmin(): Promise<boolean> {
   return verifyToken("admin", (await cookies()).get(ADMIN_COOKIE)?.value);
+}
+
+/** Which of the couple is checking notifications on this device, or null if they haven't said. */
+export async function getWho(): Promise<Side | null> {
+  const value = (await cookies()).get(ADMIN_WHO_COOKIE)?.value;
+  return sides.find((s) => s.value === value)?.value ?? null;
+}
+
+const NOTIFICATION_COLUMNS = "id, party_id, party_name, respondent, kind, changes, created_at";
+
+/** Every RSVP notification, newest first. Admin only. */
+export async function getNotifications(limit?: number): Promise<RsvpNotification[]> {
+  let query = supabase().from("rsvp_notifications").select(NOTIFICATION_COLUMNS).order("created_at", { ascending: false });
+  if (limit) query = query.limit(limit);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data as RsvpNotification[];
+}
+
+type Seen = { bell_seen_at: string | null; list_seen_at: string | null };
+
+/**
+ * How far this person has read: the bell up to `bell_seen_at`, the
+ * notifications page up to `list_seen_at`. Kept as the strings Postgres sent,
+ * since a JS Date would drop the microseconds and the newest one would count
+ * as unread forever.
+ */
+export async function getSeen(who: Side | null): Promise<Seen> {
+  if (!who) return { bell_seen_at: null, list_seen_at: null };
+  const { data, error } = await supabase().from("admin_seen").select("bell_seen_at, list_seen_at").eq("person", who).maybeSingle();
+  if (error) throw error;
+  return data ?? { bell_seen_at: null, list_seen_at: null };
+}
+
+/** How many notifications came after a seen marker (all of them, without one). */
+export async function countNewer(seenAt: string | null): Promise<number> {
+  let query = supabase().from("rsvp_notifications").select("id", { count: "exact", head: true });
+  if (seenAt) query = query.gt("created_at", seenAt);
+  const { count, error } = await query;
+  if (error) throw error;
+  return count ?? 0;
+}
+
+/** The bell's latest notifications, and how many are new to whoever's checking. Admin only. */
+export async function getBell(): Promise<BellData> {
+  const who = await getWho();
+  const [items, seen] = await Promise.all([getNotifications(20), getSeen(who)]);
+  return { who, unread: who ? await countNewer(seen.bell_seen_at) : 0, items };
 }
 
 export type SummaryRow = {
@@ -115,6 +163,14 @@ export const partyUpdateSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("table"), id: uuid, table: z.number().int().min(1).max(seatingTables.length).nullable() }),
   // Whether the party's paper invite card has gone out.
   z.object({ action: z.literal("card"), id: uuid, sent: z.boolean() }),
+]);
+
+export const notificationUpdateSchema = z.discriminatedUnion("action", [
+  // Which of the couple is checking on this device.
+  z.object({ action: z.literal("who"), who: side }),
+  // Everything up to this notification has been seen in the bell, and with
+  // `list` on the notifications page too.
+  z.object({ action: z.literal("seen"), id: uuid, list: z.boolean() }),
 ]);
 
 const NAME_REQUIRED = "Please enter a first and last name (or tick Plus-one).";
@@ -296,6 +352,28 @@ export async function updateParty(input: z.infer<typeof partyUpdateSchema>): Pro
       return seatParty(input.id, input.table);
     case "card":
       return setCardSent(input.id, input.sent);
+  }
+}
+
+export async function updateNotifications(input: z.infer<typeof notificationUpdateSchema>): Promise<string | null> {
+  switch (input.action) {
+    case "who":
+      // Set by the server so it lasts: Safari caps cookies set from JavaScript at 7 days.
+      (await cookies()).set(ADMIN_WHO_COOKIE, input.who, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 365,
+        path: "/",
+      });
+      return null;
+    case "seen": {
+      const who = await getWho();
+      if (!who) return "Pick who's checking first.";
+      const { error } = await supabase().rpc("mark_notifications_seen", { who, upto: input.id, list: input.list });
+      if (error) throw error;
+      return null;
+    }
   }
 }
 

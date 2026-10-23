@@ -40,7 +40,16 @@ function plusOneLabels(drafts: Draft[]): Map<string, string> {
   return new Map(plusOnes.map((d, i) => [d.id, plusOnes.length > 1 ? `Your guest ${i + 1}` : "Your guest"]));
 }
 
-export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p: Party) => void }) {
+export default function RsvpForm({
+  party,
+  respondent,
+  onSaved,
+}: {
+  party: Party;
+  /** The name they looked the invite up by, for the couple's notifications. */
+  respondent: string;
+  onSaved: (p: Party) => void;
+}) {
   const [drafts, setDrafts] = useState<Draft[]>(() => party.guests.map(toDraft));
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -86,6 +95,7 @@ export default function RsvpForm({ party, onSaved }: { party: Party; onSaved: (p
             dietary: d.attending ? d.dietary : null,
             ...(d.is_plus_one && { first_name: d.first_name, last_name: d.last_name }),
           })),
+          respondent,
         }),
       });
       const data = await res.json();

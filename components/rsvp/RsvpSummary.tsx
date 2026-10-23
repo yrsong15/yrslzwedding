@@ -9,10 +9,13 @@ const mealLabel = (v: string | null) => mealOptions.find((m) => m.value === v)?.
 
 export default function RsvpSummary({
   party,
+  respondent,
   onEdit,
   onCleared,
 }: {
   party: Party;
+  /** The name they looked the invite up by, for the couple's notifications. */
+  respondent: string;
   onEdit: () => void;
   onCleared: (p: Party) => void;
 }) {
@@ -30,7 +33,7 @@ export default function RsvpSummary({
       const res = await fetch("/api/rsvp", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ partyId: party.id }),
+        body: JSON.stringify({ partyId: party.id, respondent }),
       });
       const data = await res.json();
       if (!res.ok) return setError(data.error ?? "Something went wrong.");

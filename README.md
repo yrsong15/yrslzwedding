@@ -57,6 +57,8 @@ The site has a separate admin section at [`/admin`](https://laurenyoungre.com/ad
 - **Invite cards**: check off each invited party once its paper invitation is in the mail, with a count of how many are still to send. Once a party's card is marked sent, nobody invited in it can be un-invited or deleted, until the card is marked not sent again.
 - **Seating chart**: a to-scale plan of the reception room with 23 tables of 8. Drag parties onto tables, then people between seats at their table. A party always sits together, and anyone who declines or is un-invited gives up their seat.
 
+A bell in the top-right corner of every admin page counts new RSVP activity: each time a guest responds, changes, or clears their RSVP, with who did it and exactly what changed. Opening it lists the latest ones, and **See all notifications** goes to the full history. Lauren and Young Re each have their own unread count; the bell asks who's checking once per device.
+
 For anything the admin pages don't cover, the Supabase dashboard has the raw `parties` and `guests` tables (editable in the Table Editor) and the `rsvp_summary` view, which gives one flat row per guest.
 
 ## Setting up the database

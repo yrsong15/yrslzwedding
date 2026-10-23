@@ -19,7 +19,8 @@ export const adminSections = [
   },
 ] as const;
 
-export default function AdminTabs({ current }: { current: (typeof adminSections)[number]["href"] }) {
+/** `current` is left out on pages that aren't one of the sections (the notifications page). */
+export default function AdminTabs({ current }: { current?: (typeof adminSections)[number]["href"] }) {
   return (
     <nav aria-label="Admin" className="mb-10 flex justify-center">
       {/* On a phone the three labels wrap to two lines, so the pill becomes a rounded box. */}

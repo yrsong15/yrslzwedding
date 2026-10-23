@@ -1,5 +1,8 @@
 // Small controls and helpers shared by the admin pages.
 
+import { sides } from "@/lib/site";
+import type { Side } from "@/lib/types";
+
 /** For matching searches: case- and spacing-insensitive. */
 export const normName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
 
@@ -38,6 +41,28 @@ export function Switch({
         }`}
       />
     </button>
+  );
+}
+
+/** Asks which of the couple is on this device, so each keeps their own unread notifications. */
+export function WhoPicker({ onPick, disabled = false }: { onPick: (who: Side) => void; disabled?: boolean }) {
+  return (
+    <div className="text-center">
+      <p className="text-sm text-muted">Who&apos;s checking? This device will remember, so you each keep your own unread count.</p>
+      <div className="mt-3 flex justify-center gap-2">
+        {sides.map((s) => (
+          <button
+            key={s.value}
+            type="button"
+            disabled={disabled}
+            onClick={() => onPick(s.value)}
+            className="rounded-full border border-plum/30 px-5 py-1.5 text-sm text-plum transition hover:bg-lavender/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender disabled:opacity-50"
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

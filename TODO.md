@@ -9,6 +9,7 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 - [ ] **FAQs.** Venue parking still says "details coming soon". Review the dress code and the other answers too.
 - [ ] **Things to do: Sights.** The five Sights picks were researched placeholders. Review them and swap in your own favorites. The restaurant, café, and bar lists are already yours.
 - [x] **Korean text check.** Have a native-speaking family member review the Home page message (로렌과 영래가 함께 인생의 새로운 출발을 하려 합니다) and the nav tab labels, including the 영래 spelling.
+- [ ] **Home page photos.** The carousel shows the sample engagement photo plus five random placeholder photos. Put the real ones in `public/photos/`, change the imports and the `photos` list (with alt text) at the top of `lib/site.ts`, and delete the `placeholder-*.jpg` files. Any shape works, since none are cropped, but each should be at least about 1000px wide so it looks sharp. The photos are in the public repo and open without the site password to anyone with a direct link.
 - [ ] **Hotel room block (optional).** If you reserve one, fill in `hotel.block` in `lib/site.ts`; the Travel page switches to showing the code and deadline.
 - [ ] **Look over every page** on your phone and on a laptop.
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import FadeIn from "@/components/FadeIn";
+import PhotoCarousel from "@/components/PhotoCarousel";
 import { couple, koreanMessage, location, rsvpDeadline, weddingDate, weddingDateLabel } from "@/lib/site";
 
 export default function Home() {
@@ -57,6 +58,12 @@ export default function Home() {
             Kindly let us know if you can make it by{" "}
             <strong className="font-medium text-ink">{rsvpDeadline}</strong>.
           </p>
+        </FadeIn>
+      </section>
+
+      <section className="py-20">
+        <FadeIn>
+          <PhotoCarousel />
         </FadeIn>
       </section>
     </>

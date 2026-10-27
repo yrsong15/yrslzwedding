@@ -1,5 +1,13 @@
 // Central place for wedding details and copy. Edit here, not in the pages.
 
+import type { StaticImageData } from "next/image";
+import engagement from "@/public/photos/engagement.jpg";
+import photo1 from "@/public/photos/placeholder-1.jpg";
+import photo2 from "@/public/photos/placeholder-2.jpg";
+import photo3 from "@/public/photos/placeholder-3.jpg";
+import photo4 from "@/public/photos/placeholder-4.jpg";
+import photo5 from "@/public/photos/placeholder-5.jpg";
+
 export const couple = {
   names: "Lauren & Young Re",
   contactEmail: "wedding@laurenyoungre.com",
@@ -33,6 +41,18 @@ export const passwordPageKo = {
     error: "문제가 발생했습니다. 다시 시도해 주세요.",
   },
 };
+// The sideways-scrolling photos on the Home page, in order. Placeholders for now
+// (the engagement photo too): put the real photos in public/photos/ and change
+// the imports above. Each is shown whole (never cropped), any shape works.
+export const photos: { src: StaticImageData; alt: string }[] = [
+  { src: engagement, alt: `${couple.names} under a flower-covered brick arch` },
+  { src: photo1, alt: "Placeholder photo" },
+  { src: photo2, alt: "Placeholder photo" },
+  { src: photo3, alt: "Placeholder photo" },
+  { src: photo4, alt: "Placeholder photo" },
+  { src: photo5, alt: "Placeholder photo" },
+];
+
 export const rsvpDeadline = "March 1, 2027";
 
 // `ko` is shown when a tab is hovered, focused, or pressed (see components/Nav.tsx).

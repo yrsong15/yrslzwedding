@@ -25,6 +25,7 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
   - the `/password` page's Korean (`passwordPageKo`). That page is bilingual for guests who read only English or only Korean, so every line has a Korean pair except the date. `PasswordForm` shows Korean only when given `ko`, so the admin login stays English only.
 
   Exceptions written directly in the page files: `PageHeader` intros (e.g. the Registry's no-gifts text) and the Travel page's airport tips.
+- **Photo carousel** (`components/PhotoCarousel.tsx`, on the Home page after "Join us in Portland"): the photos are `photos` in `lib/site.ts`, statically imported from `public/photos/`. All are placeholders for now: the engagement photo (first) and random ones. They share one height at their own widths, so none are cropped. It's a native sideways scroll with snapping, plus arrow buttons from `sm` up for mice.
 - **Food & drink entries** (`foodAndDrink`): a single-location place gets `map` (name + address, turned into a Google Maps search link). A place with several locations gets `multiple: true` and no link. Pho Van is deliberately a `map` entry pointing at its original 82nd Ave location. Javelina's query is name-only because the restaurant moved in 2025.
 - **Bilingual nav** (`components/Nav.tsx`): on desktop, `BilingualLabel` flips each tab's English label to its Korean `ko` label on hover, keyboard focus, or press.
   - Both labels share one grid cell, so each tab is as wide as its longer label, with the English centered. There's no layout shift.

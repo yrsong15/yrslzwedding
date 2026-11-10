@@ -92,6 +92,12 @@ export default function RsvpSummary({
         ))}
       </ul>
 
+      {party.email_hint && (
+        <p className="mt-4 text-sm text-muted">
+          Email: <span className="text-ink">{party.email_hint}</span>
+        </p>
+      )}
+
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button
           onClick={onEdit}

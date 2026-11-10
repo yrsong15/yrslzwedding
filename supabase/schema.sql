@@ -16,6 +16,9 @@ create table if not exists parties (
   -- parties with someone invited, and while set, nobody invited in the party can
   -- be un-invited or deleted. Admin-only.
   card_sent_at timestamptz,
+  -- The one email address the party gives when they RSVP (required only if
+  -- someone's coming). Admin-only: guests get back just a masked hint.
+  email text,
   notes text,
   responded_at timestamptz,
   created_at timestamptz not null default now()
@@ -97,7 +100,8 @@ select
   g.dietary,
   p.responded_at,
   g.invited,
-  p.side
+  p.side,
+  p.email
 from guests g
 join parties p on p.id = g.party_id
 order by p.name, g.is_plus_one, g.last_name, g.first_name;

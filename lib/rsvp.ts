@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { EMAIL_MAX, isEmail, maskEmail } from "./email";
 import { diffParty } from "./notifications";
 import { mealOptions } from "./site";
 import { supabase, type Guest, type Party } from "./supabase";
@@ -11,7 +12,12 @@ import type { AdminGuest, RsvpNotification } from "./types";
 // Embedded guests are filtered to invited ones and kept in the couple's order.
 const PUBLIC_GUEST_COLUMNS =
   "id, party_id, first_name, last_name, is_plus_one, attending, attending_welcome, meal, dietary, updated_at";
-const PARTY_SELECT = `id, name, invited_to_welcome, responded_at, guests(${PUBLIC_GUEST_COLUMNS})`;
+const PARTY_SELECT = `id, name, invited_to_welcome, responded_at, email, guests(${PUBLIC_GUEST_COLUMNS})`;
+
+// The party's email is read here only to mask it. Every party this file
+// returns goes through toPublic, so the full address never leaves the server.
+type PartyRow = Omit<Party, "email_hint"> & { email: string | null };
+const toPublic = ({ email, ...party }: PartyRow): Party => ({ ...party, email_hint: email ? maskEmail(email) : null });
 
 /** The party with only its invited guests, or null if nobody in it is invited. */
 export async function getParty(id: string): Promise<Party | null> {
@@ -23,8 +29,8 @@ export async function getParty(id: string): Promise<Party | null> {
     .order("position", { referencedTable: "guests" })
     .maybeSingle();
   if (error) throw error;
-  const party = data as Party | null;
-  return party && party.guests.length > 0 ? party : null;
+  const party = data as PartyRow | null;
+  return party && party.guests.length > 0 ? toPublic(party) : null;
 }
 
 // Case- and spacing-insensitive, so "young re  song" matches "Young Re Song".
@@ -55,7 +61,7 @@ export async function findPartiesByName(fullName: string): Promise<Party[]> {
     .eq("guests.invited", true)
     .order("position", { referencedTable: "guests" });
   if (pErr) throw pErr;
-  return parties as Party[];
+  return (parties as PartyRow[]).map(toPublic);
 }
 
 const mealValues = mealOptions.map((m) => m.value) as [string, ...string[]];
@@ -75,6 +81,8 @@ export const rsvpSchema = z.object({
       }),
     )
     .min(1),
+  // One address for the whole party. Left out to keep the one already saved.
+  email: z.string().trim().toLowerCase().max(EMAIL_MAX).refine(isEmail).optional(),
   // The name they looked the invite up by, for the couple's notifications.
   respondent: z.string().trim().max(200).optional(),
 });
@@ -100,6 +108,10 @@ export function validateAgainstParty(input: RsvpInput, party: Party): string | n
     }
   }
   if (input.guests.length !== party.guests.length) return "Please respond for everyone in your party.";
+  // A party where everyone declines doesn't have to give one.
+  if (input.guests.some((g) => g.attending) && !input.email && !party.email_hint) {
+    return "Please enter an email address for your party.";
+  }
   return null;
 }
 
@@ -139,7 +151,7 @@ export async function saveRsvp(input: RsvpInput, party: Party): Promise<void> {
   const nobodyComing = input.guests.every((g) => !g.attending);
   const { error } = await db
     .from("parties")
-    .update({ responded_at: now, ...(nobodyComing && { table_number: null }) })
+    .update({ responded_at: now, ...(nobodyComing && { table_number: null }), ...(input.email && { email: input.email }) })
     .eq("id", party.id);
   if (error) throw error;
 }
@@ -148,6 +160,7 @@ export async function clearRsvp(party: Party): Promise<void> {
   const db = supabase();
   // Only the guests this party can see (the invited ones). Plus-one names are
   // kept, so a name the couple (or the party) entered survives starting over.
+  // So is the party's email.
   const ids = party.guests.map((g) => g.id);
   const reset: Partial<Guest> = { attending: null, attending_welcome: null, meal: null, dietary: null, updated_at: null };
   const { error } = await db.from("guests").update(reset).in("id", ids).eq("party_id", party.id);

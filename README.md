@@ -35,6 +35,7 @@ Guests enter the shared guest password once, and then can browse every page. Eac
   - welcome drinks on Friday
   - a meal choice and dietary notes for each person
   - names for any plus-ones
+  - one email address for the party (asked only if someone's coming)
 
   They can come back later to see or change their answers.
 - **Schedule**: the weekend's events.
@@ -53,6 +54,7 @@ The site has a separate admin section at [`/admin`](https://laurenyoungre.com/ad
   - Set whose guests each party is (Lauren's or Young Re's).
   - Add, rename, reorder, and delete people and parties.
   - Enter or correct someone's RSVP, e.g. for an answer given by phone.
+  - See, add, or change each party's email address.
   - Search and filter the list, and download it as a CSV.
 - **Invite cards**: check off each invited party once its paper invitation is in the mail, with a count of how many are still to send. Once a party's card is marked sent, nobody invited in it can be un-invited or deleted, until the card is marked not sent again.
 - **Seating chart**: a to-scale plan of the reception room with 23 tables of 8. Drag parties onto tables, then people between seats at their table. A party always sits together, and anyone who declines or is un-invited gives up their seat.

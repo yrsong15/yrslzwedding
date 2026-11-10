@@ -6,7 +6,11 @@ import { clearRsvp, getParty, recordRsvpChange, rsvpSchema, saveRsvp, validateAg
 export async function POST(req: Request) {
   const parsed = rsvpSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Please complete every field." }, { status: 400 });
+    const badEmail = parsed.error.issues.some((i) => i.path[0] === "email");
+    return NextResponse.json(
+      { error: badEmail ? "Please enter a valid email address." : "Please complete every field." },
+      { status: 400 },
+    );
   }
   try {
     const party = await getParty(parsed.data.partyId);

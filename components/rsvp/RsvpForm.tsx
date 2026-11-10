@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { EMAIL_MAX, MASK_CHAR, isEmail, suggestEmail } from "@/lib/email";
 import type { Guest, Party } from "@/lib/types";
 import { mealOptions, schedule } from "@/lib/site";
 
@@ -51,8 +52,26 @@ export default function RsvpForm({
   onSaved: (p: Party) => void;
 }) {
   const [drafts, setDrafts] = useState<Draft[]>(() => party.guests.map(toDraft));
+  // One address for the whole party. The saved one never comes back in full,
+  // only masked as party.email_hint. The box starts with that mask in it, and
+  // leaving the mask (or a blank box) means "keep the one you have".
+  const [email, setEmail] = useState(party.email_hint ?? "");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  // The email box only appears once someone says yes. A party where everyone
+  // declines is never asked, and anything typed before they changed their
+  // minds isn't sent.
+  const anyoneComing = drafts.some((d) => d.attending);
+  const emailRequired = anyoneComing && !party.email_hint;
+  // The address to save: what's in the box, unless it's hidden or still the mask.
+  const newEmail = anyoneComing && email.trim() !== party.email_hint ? email.trim() : "";
+  // A likely typo in the domain ("gmial.com") gets a "Did you mean…?" that they
+  // can take or wave off. It's asked about the address as it stood when they
+  // left the box or tried to send, so it doesn't flicker while they type.
+  const [askedAbout, setAskedAbout] = useState("");
+  const [confirmedEmail, setConfirmedEmail] = useState("");
+  const suggestion = newEmail && isEmail(newEmail) && newEmail !== confirmedEmail ? suggestEmail(newEmail) : null;
+  const single = party.guests.length === 1;
 
   const update = (id: string, patch: Partial<Draft>) =>
     setDrafts((ds) => ds.map((d) => (d.id === id ? { ...d, ...patch } : d)));
@@ -71,6 +90,11 @@ export default function RsvpForm({
       if (party.invited_to_welcome && d.attending && d.attending_welcome === null)
         return `Please let us know if ${who} will join us for welcome drinks.`;
     }
+    // An edited mask still has its dots in it, which no real address does.
+    if (newEmail.includes(MASK_CHAR)) return "Please type your full email address, without the dots.";
+    if (newEmail ? !isEmail(newEmail) : emailRequired) {
+      return newEmail ? "Please enter a valid email address." : "Please enter an email address for your party.";
+    }
     return null;
   }
 
@@ -78,6 +102,11 @@ export default function RsvpForm({
     e.preventDefault();
     const problem = clientError();
     if (problem) return setError(problem);
+    // Hold a likely typo back once, until they fix it or say it's right.
+    if (suggestion) {
+      setAskedAbout(newEmail);
+      return setError("Please double-check your email address.");
+    }
     setError("");
     setSaving(true);
     try {
@@ -95,6 +124,7 @@ export default function RsvpForm({
             dietary: d.attending ? d.dietary : null,
             ...(d.is_plus_one && { first_name: d.first_name, last_name: d.last_name }),
           })),
+          ...(newEmail && { email: newEmail }),
           respondent,
         }),
       });
@@ -109,7 +139,8 @@ export default function RsvpForm({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-6">
+    // noValidate: problems show in the form's own message, not the browser's bubbles.
+    <form onSubmit={submit} noValidate className="space-y-6">
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.25em] text-muted">Invitation for</p>
         <h2 className="font-serif text-4xl text-plum">{party.name}</h2>
@@ -211,6 +242,77 @@ export default function RsvpForm({
           </AnimatePresence>
         </motion.fieldset>
       ))}
+
+      <AnimatePresence initial={false}>
+        {anyoneComing && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            className="rounded-3xl border border-ink/10 bg-white/60 p-6"
+          >
+            <label htmlFor="rsvp-email" className="mb-2 block text-xs uppercase tracking-[0.2em] text-muted">
+              {single ? "Your email" : "Email for your party"}
+            </label>
+            <input
+              id="rsvp-email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              maxLength={EMAIL_MAX}
+              value={email}
+              aria-required={emailRequired}
+              aria-describedby="rsvp-email-help"
+              onChange={(e) => setEmail(e.target.value)}
+              // The mask can't be edited into a real address, so typing replaces it.
+              onFocus={(e) => email === party.email_hint && e.target.select()}
+              onBlur={() => setAskedAbout(newEmail)}
+              className="w-full rounded-xl border border-ink/15 bg-white/70 px-4 py-2.5 outline-none transition focus:border-lavender focus:ring-2 focus:ring-lavender/30"
+            />
+            {suggestion && askedAbout === newEmail && (
+              <p className="mt-2 text-sm text-orange-dark" role="status">
+                Did you mean{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail(suggestion);
+                    setError("");
+                  }}
+                  className="font-medium underline underline-offset-4"
+                >
+                  {suggestion}
+                </button>
+                ?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmedEmail(newEmail);
+                    setError("");
+                  }}
+                  className="ml-2 text-muted underline underline-offset-4 hover:text-orange-dark"
+                >
+                  No, it&apos;s right
+                </button>
+              </p>
+            )}
+            <p id="rsvp-email-help" className="mt-2 text-sm text-muted">
+              {party.email_hint ? (
+                "We already have your full address, it's partially hidden here just to keep it private. To change it, just type a new one!"
+              ) : (
+                <>
+                  {!single && (
+                    <>
+                      Just one address for everyone on this invitation, please and thank you!
+                      <br />
+                    </>
+                  )}
+                  We&apos;ll use this to be in touch if anything comes up. We&apos;ll also send you photos from the wedding!
+                </>
+              )}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <p className="min-h-6 text-center text-sm text-orange-dark" role="alert">
         {error}

@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ADMIN_COOKIE, ADMIN_WHO_COOKIE, verifyToken } from "./auth";
 import { cardSentMessage, invitedParty } from "./cards";
+import { EMAIL_MAX, isEmail } from "./email";
 import { arrangeTable, moveWithinTable, noRoomMessage, savedSeat, seatingTables, seatsPerTable, takesSeat } from "./seating";
 import { mealOptions, sides } from "./site";
 import { supabase } from "./supabase";
@@ -73,6 +74,8 @@ export type SummaryRow = {
   responded_at: string | null;
   invited: boolean;
   side: "lauren" | "young_re" | null;
+  /** The party's one email, repeated on each of its rows. */
+  email: string | null;
 };
 
 export async function getSummary(): Promise<SummaryRow[]> {
@@ -87,7 +90,7 @@ const csvCell = (v: unknown) => {
 };
 
 export function toCsv(rows: SummaryRow[]): string {
-  const headers = ["party", "side", "first_name", "last_name", "is_plus_one", "invited", "attending", "welcome_drinks", "meal", "dietary", "responded_at"] as const;
+  const headers = ["party", "side", "first_name", "last_name", "is_plus_one", "invited", "attending", "welcome_drinks", "meal", "dietary", "responded_at", "email"] as const;
   return [headers.join(","), ...rows.map((r) => headers.map((h) => csvCell(r[h])).join(","))].join("\n");
 }
 
@@ -95,7 +98,7 @@ export function toCsv(rows: SummaryRow[]): string {
 export async function getGuestList(): Promise<AdminParty[]> {
   const { data, error } = await supabase()
     .from("parties")
-    .select("id, name, invited_to_welcome, responded_at, side, table_number, card_sent_at, guests(*)")
+    .select("id, name, invited_to_welcome, responded_at, side, table_number, card_sent_at, email, guests(*)")
     .order("position")
     .order("position", { referencedTable: "guests" });
   if (error) throw error;
@@ -163,6 +166,12 @@ export const partyUpdateSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("table"), id: uuid, table: z.number().int().min(1).max(seatingTables.length).nullable() }),
   // Whether the party's paper invite card has gone out.
   z.object({ action: z.literal("card"), id: uuid, sent: z.boolean() }),
+  // The party's one email address; null removes it.
+  z.object({
+    action: z.literal("email"),
+    id: uuid,
+    email: z.string().trim().toLowerCase().max(EMAIL_MAX).refine(isEmail).nullable(),
+  }),
 ]);
 
 export const notificationUpdateSchema = z.discriminatedUnion("action", [
@@ -352,6 +361,11 @@ export async function updateParty(input: z.infer<typeof partyUpdateSchema>): Pro
       return seatParty(input.id, input.table);
     case "card":
       return setCardSent(input.id, input.sent);
+    case "email": {
+      const { error } = await db.from("parties").update({ email: input.email }).eq("id", input.id);
+      if (error) throw error;
+      return null;
+    }
   }
 }
 

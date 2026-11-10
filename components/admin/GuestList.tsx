@@ -17,6 +17,7 @@ import {
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cardSentMessage } from "@/lib/cards";
+import { isEmail } from "@/lib/email";
 import { mealOptions, sides } from "@/lib/site";
 import type { AdminGuest, AdminParty, Side } from "@/lib/types";
 import { Picker, Switch, normName, shortDate } from "./controls";
@@ -41,6 +42,7 @@ type Change =
   | { type: "side"; partyId: string; side: Side }
   | { type: "rename-guest"; id: string; first_name: string; last_name: string }
   | { type: "rename-party"; id: string; name: string }
+  | { type: "email-party"; id: string; email: string | null }
   | { type: "reorder-parties"; ids: string[] }
   | { type: "reorder-guests"; partyId: string; ids: string[] }
   | ({ type: "response"; id: string } & Response);
@@ -69,6 +71,8 @@ function applyChange(parties: AdminParty[], c: Change): AdminParty[] {
       }));
     case "rename-party":
       return parties.map((p) => (p.id === c.id ? { ...p, name: c.name } : p));
+    case "email-party":
+      return parties.map((p) => (p.id === c.id ? { ...p, email: c.email } : p));
     case "reorder-parties":
       return inOrder(parties, c.ids);
     case "reorder-guests":
@@ -104,6 +108,8 @@ function requestFor(c: Change): Promise<string | null> {
       return send("PATCH", "/api/admin/guests", { action: "rename", id: c.id, first_name: c.first_name, last_name: c.last_name });
     case "rename-party":
       return send("PATCH", "/api/admin/parties", { action: "rename", id: c.id, name: c.name });
+    case "email-party":
+      return send("PATCH", "/api/admin/parties", { action: "email", id: c.id, email: c.email });
     case "reorder-parties":
       return send("PATCH", "/api/admin/parties", { action: "reorder", ids: c.ids });
     case "reorder-guests":
@@ -476,6 +482,17 @@ function PartyRows({
                 {party.card_sent_at ? ` · card sent ${shortDate(party.card_sent_at)}` : ""}
                 {party.responded_at ? ` · responded ${shortDate(party.responded_at)}` : ""}
               </span>
+              {/* The one address the party gave when they RSVP'd. An empty box removes it. */}
+              <EditableText
+                fields={[{ label: "Email", value: party.email ?? "", type: "email", width: "w-64" }]}
+                onSave={([typed]) => {
+                  const email = typed.toLowerCase() || null;
+                  if (email && !isEmail(email)) return alert("Please enter a valid email address.");
+                  onChange({ type: "email-party", id: party.id, email });
+                }}
+                editLabel={`${party.email ? "Edit" : "Add"} email for ${party.name}`}
+                display={<span className="text-xs text-muted">{party.email ?? "No email"}</span>}
+              />
             </div>
           </div>
         </td>
@@ -789,7 +806,7 @@ function EditableText({
   editLabel,
   display,
 }: {
-  fields: { label: string; value: string; required?: boolean; width?: string }[];
+  fields: { label: string; value: string; required?: boolean; width?: string; type?: "email" }[];
   onSave: (values: string[]) => void;
   editLabel: string;
   display: React.ReactNode;
@@ -855,6 +872,7 @@ function EditableText({
           placeholder={f.label}
           autoFocus={i === 0}
           required={f.required}
+          type={f.type}
           value={values[i]}
           onChange={(e) => setValues(values.map((v, j) => (j === i ? e.target.value : v)))}
           className={`${field} ${f.width ?? "w-32"} py-1`}

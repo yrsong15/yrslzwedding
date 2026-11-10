@@ -24,7 +24,7 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 ## Security
 
 - [x] **Set a real `ADMIN_PASSWORD`** in `.env.local`. Save it in your password manager, and enter the same value in Vercel when you deploy.
-- [ ] **(Optional) Tighten RSVP privacy.** Right now anyone with the site password and a guest's full name can see and change that party's answers, including dietary notes. A second check, like an email or another party member's name, could gate that.
+- [ ] **(Optional) Tighten RSVP privacy.** Right now anyone with the site password and a guest's full name can see and change that party's answers, including dietary notes. The party's email is the exception: guests only ever see it masked. A second check could gate the rest, like another party member's name, or the party's email once they've given one on their first RSVP.
 - [x] **Decide on the guest password.** It's `pdx`; this goes on the invitations. If you change it in Vercel later, redeploy, and note that everyone gets logged out.
 
 ## Launch

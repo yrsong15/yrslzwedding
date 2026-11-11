@@ -84,16 +84,6 @@ export async function getSummary(): Promise<SummaryRow[]> {
   return data as SummaryRow[];
 }
 
-const csvCell = (v: unknown) => {
-  const s = v === null || v === undefined ? "" : String(v);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-};
-
-export function toCsv(rows: SummaryRow[]): string {
-  const headers = ["party", "side", "first_name", "last_name", "is_plus_one", "invited", "attending", "welcome_drinks", "meal", "dietary", "responded_at", "email"] as const;
-  return [headers.join(","), ...rows.map((r) => headers.map((h) => csvCell(r[h])).join(","))].join("\n");
-}
-
 /** Every party with every guest, invited or not, in the couple's saved order. Admin only. */
 export async function getGuestList(): Promise<AdminParty[]> {
   const { data, error } = await supabase()

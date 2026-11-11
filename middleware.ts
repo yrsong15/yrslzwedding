@@ -18,5 +18,11 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   // Everything except the password screen, its API, and static assets.
-  matcher: ["/((?!password|api/auth|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)"],
+  // - (?![\w-]) keeps those two exact: a later /password-reset or /api/auth-x
+  //   page would be gated, not let through by its prefix.
+  // - Image files skip the gate only outside /api/, so no API path gets
+  //   through by ending in ".png".
+  matcher: [
+    "/((?!password(?![\\w-])|api/auth(?![\\w-])|_next/static|_next/image|favicon.ico|(?!api/).*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)",
+  ],
 };

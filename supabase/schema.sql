@@ -76,8 +76,20 @@ create table if not exists admin_seen (
   list_seen_at timestamptz
 );
 
+-- Wrong tries at the admin password, to slow down guessing (lib/loginLimit.ts):
+-- ten from one address within 15 minutes and it's refused for a while. Rows
+-- older than a day are deleted as new ones come in. Admin-only.
+create table if not exists login_attempts (
+  id bigint generated always as identity primary key,
+  ip text not null,
+  at timestamptz not null default now()
+);
+
+create index if not exists login_attempts_ip_at_idx on login_attempts (ip, at);
+
 -- The site talks to the DB only through server routes using the service-role
 -- key, which bypasses RLS. Enabling RLS with no policies blocks the anon key.
+alter table login_attempts enable row level security;
 alter table parties enable row level security;
 alter table guests enable row level security;
 alter table rsvp_notifications enable row level security;
@@ -144,7 +156,8 @@ $$;
 -- Only the server (service_role) may touch these. Explicit so it works whether
 -- or not "Automatically expose new tables" is enabled in the project. New
 -- functions are executable by PUBLIC unless revoked.
-revoke all on parties, guests, rsvp_summary, rsvp_notifications, admin_seen from anon, authenticated;
+revoke all on parties, guests, rsvp_summary, rsvp_notifications, admin_seen, login_attempts from anon, authenticated;
+grant select, insert, delete on login_attempts to service_role;
 grant select, insert, update, delete on parties, guests, admin_seen to service_role;
 grant select on rsvp_summary to service_role;
 grant select, insert, delete on rsvp_notifications to service_role;

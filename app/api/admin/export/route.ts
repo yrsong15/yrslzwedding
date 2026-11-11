@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSummary, isAdmin, toCsv } from "@/lib/admin";
+import { getSummary, isAdmin } from "@/lib/admin";
+import { toCsv } from "@/lib/csv";
 
 export async function GET() {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -107,7 +107,10 @@ export function validateAgainstParty(input: RsvpInput, party: Party): string | n
       return "Please let us know about welcome drinks for each guest.";
     }
   }
-  if (input.guests.length !== party.guests.length) return "Please respond for everyone in your party.";
+  // Each person once: the same person sent twice would otherwise stand in for someone left out.
+  if (input.guests.length !== party.guests.length || new Set(input.guests.map((g) => g.id)).size !== input.guests.length) {
+    return "Please respond for everyone in your party.";
+  }
   // A party where everyone declines doesn't have to give one.
   if (input.guests.some((g) => g.attending) && !input.email && !party.email_hint) {
     return "Please enter an email address for your party.";

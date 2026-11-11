@@ -54,6 +54,9 @@ export function passwordFor(scope: Scope): string {
   return pw;
 }
 
-export function checkPassword(scope: Scope, attempt: string): boolean {
-  return timingSafeEqual(attempt.trim().toLowerCase(), passwordFor(scope).toLowerCase());
+// Compares HMACs, which are always the same length, so the timing doesn't
+// show how long the password is.
+export async function checkPassword(scope: Scope, attempt: string): Promise<boolean> {
+  const [a, b] = await Promise.all([hmac(attempt.trim().toLowerCase()), hmac(passwordFor(scope).toLowerCase())]);
+  return timingSafeEqual(a, b);
 }

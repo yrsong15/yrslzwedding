@@ -6,18 +6,28 @@ import { motion } from "framer-motion";
 import PasswordForm from "@/components/PasswordForm";
 import { couple, weddingDateLabel, location, passwordPageKo } from "@/lib/site";
 
+// Where to go after logging in: `next` only if it stays on this site. Resolved
+// the way the browser will, since a prefix check misses "/\evil.com" and
+// "/<tab>/evil.com", which browsers read as "//evil.com". Browser only.
+function destination(next: string | null): string {
+  if (!next) return "/";
+  try {
+    const url = new URL(next, window.location.origin);
+    return url.origin === window.location.origin ? url.pathname + url.search + url.hash : "/";
+  } catch {
+    return "/";
+  }
+}
+
 function Gate() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next");
-  // Only allow internal redirects.
-  const dest = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
 
   return (
     <PasswordForm
       ko={passwordPageKo.form}
       onSuccess={() => {
-        router.replace(dest);
+        router.replace(destination(params.get("next")));
         router.refresh();
       }}
     />

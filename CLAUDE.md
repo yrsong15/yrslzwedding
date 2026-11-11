@@ -32,6 +32,9 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
   - The slide is `motion-safe` only, so reduced-motion users get a fade.
   - The mobile menu instead shows the Korean as a permanent second line, because touch screens can't hover.
 - **Password gate:** `middleware.ts` protects everything except `/password`, `/api/auth`, and static assets. The cookie token is an HMAC of `scope:password` keyed by `SITE_SECRET` (`lib/auth.ts`, Web Crypto so it runs on the Edge). `/admin` uses a second scope (`admin_auth` cookie, `ADMIN_PASSWORD`), checked server-side via `lib/admin.ts`, not in middleware: first thing in each `/admin` page, before any query, and in the export route and `adminMutation`. Not in a layout: a layout and its page render in parallel, so the page's data would still load.
+  - **The matcher** lets through exactly `/password` and `/api/auth` (not anything that merely starts with them), and image files only outside `/api/`.
+  - **After login,** `/password` follows `?next=` only if it resolves to this site (`destination` in `app/password/page.tsx`). It resolves the URL as the browser would, because a prefix check misses `/\evil.com`.
+- **CSV export** (`GET /api/admin/export`, `lib/csv.ts`): guests type some of the cells (plus-one names, dietary notes, the email), so `csvCell` puts an apostrophe in front of any that start with `=`, `+`, `-`, or `@`. Otherwise Excel or Sheets would run them as formulas. `lib/csv.ts` has no server imports, so it can be run with `npx tsx`.
 - **Route groups:** `app/(site)/layout.tsx` adds the nav and footer for the gated pages. `app/password/` sits outside the group, so it gets a bare layout.
 - **Database access is server-only.** `lib/supabase.ts` (marked `server-only`) uses the secret/service-role key (`SUPABASE_SERVICE_ROLE_KEY`, an `sb_secret_…` key). The `anon` and `authenticated` roles are locked out three ways:
   - RLS is enabled with no policies.

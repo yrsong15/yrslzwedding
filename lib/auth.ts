@@ -54,9 +54,12 @@ export function passwordFor(scope: Scope): string {
   return pw;
 }
 
+// The guest password is forgiving about capitals (it's typed off an
+// invitation). The admin one must match exactly, so it's harder to guess.
 // Compares HMACs, which are always the same length, so the timing doesn't
 // show how long the password is.
 export async function checkPassword(scope: Scope, attempt: string): Promise<boolean> {
-  const [a, b] = await Promise.all([hmac(attempt.trim().toLowerCase()), hmac(passwordFor(scope).toLowerCase())]);
+  const fold = (s: string) => (scope === "site" ? s.toLowerCase() : s);
+  const [a, b] = await Promise.all([hmac(fold(attempt.trim())), hmac(fold(passwordFor(scope)))]);
   return timingSafeEqual(a, b);
 }

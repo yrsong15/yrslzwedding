@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SITE_COOKIE, verifyToken } from "@/lib/auth";
 
-export async function middleware(req: NextRequest) {
+// The site-wide password gate. Next 16 calls this file "proxy" (it was
+// middleware.ts) and always runs it on Node.
+export async function proxy(req: NextRequest) {
   const ok = await verifyToken("site", req.cookies.get(SITE_COOKIE)?.value);
   if (ok) return NextResponse.next();
 

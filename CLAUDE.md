@@ -10,11 +10,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npx tsc --noEmit`: type-check only
 - `npm run import-guests -- guests.csv`: load a guest list CSV into Supabase (format in `guests.example.csv`)
 
-There is no test suite. Verify by running the dev server. After changing `SITE_PASSWORD` or `ADMIN_PASSWORD` in `.env.local`, restart `npm run dev`. The route handlers pick up the new value, but the Edge middleware keeps the old one, so every login bounces back to `/password`. Production isn't affected. Every route except `/password` requires the `site_auth` cookie, so either log in through `POST /api/auth` with `{"password":"<SITE_PASSWORD>"}` and a cookie jar, or use the browser.
+There is no test suite. Verify by running the dev server. After changing `SITE_PASSWORD` or `ADMIN_PASSWORD` in `.env.local`, restart `npm run dev`. Under Next 15 the route handlers picked up the new value but the Edge middleware kept the old one, so every login bounced back to `/password`. The gate is now `proxy.ts` on Node, which may have fixed this, but that hasn't been checked, so restart anyway. Production isn't affected. Next 16 keeps the dev build in `.next/dev` and refuses to start a second `next dev` in the same folder. Every route except `/password` requires the `site_auth` cookie, so either log in through `POST /api/auth` with `{"password":"<SITE_PASSWORD>"}` and a cookie jar, or use the browser.
 
 ## Architecture
 
-Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
+Next.js 16 App Router (Turbopack) + Tailwind v4 + Supabase, hosted on Vercel.
 
 - **Most content lives in `lib/site.ts`:**
   - names, dates, the Korean Home message (`koreanMessage`). The couple is always written Lauren first: "Lauren & Young Re", and in Korean 로렌과 영래가 (the particles change with the order, so don't just swap the names).
@@ -31,7 +31,7 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
   - Both labels share one grid cell, so each tab is as wide as its longer label, with the English centered. There's no layout shift.
   - The slide is `motion-safe` only, so reduced-motion users get a fade.
   - The mobile menu instead shows the Korean as a permanent second line, because touch screens can't hover.
-- **Password gate:** `middleware.ts` protects everything except `/password`, `/api/auth`, and static assets. The cookie token is an HMAC of `scope:password` keyed by `SITE_SECRET` (`lib/auth.ts`, Web Crypto so it runs on the Edge). `/admin` uses a second scope (`admin_auth` cookie, `ADMIN_PASSWORD`), checked server-side via `lib/admin.ts`, not in middleware: first thing in each `/admin` page, before any query, and in the export route and `adminMutation`. Not in a layout: a layout and its page render in parallel, so the page's data would still load.
+- **Password gate:** `proxy.ts` (Next 16's name for middleware, always on Node) protects everything except `/password`, `/api/auth`, and static assets. The cookie token is an HMAC of `scope:password` keyed by `SITE_SECRET` (`lib/auth.ts`, Web Crypto). `/admin` uses a second scope (`admin_auth` cookie, `ADMIN_PASSWORD`), checked server-side via `lib/admin.ts`, not in the proxy: first thing in each `/admin` page, before any query, and in the export route and `adminMutation`. Not in a layout: a layout and its page render in parallel, so the page's data would still load.
   - **The matcher** lets through exactly `/password` and `/api/auth` (not anything that merely starts with them), and image files only outside `/api/`.
   - **Capitals:** the guest password matches in any case (it's typed off an invitation). The admin password must match exactly.
   - **Admin login limit** (`lib/loginLimit.ts`, the `login_attempts` table): ten wrong admin passwords from one IP address within 15 minutes, and `/api/auth` answers 429 to that address, even for the right password, until the oldest try ages out. Guest logins aren't limited. If the check itself fails it lets the login through, so a database problem can't lock the couple out. To test it locally without locking yourself out, send an `X-Forwarded-For` header with a made-up address.
@@ -111,7 +111,7 @@ Next.js 15 App Router + Tailwind v4 + Supabase, hosted on Vercel.
   4. Put back the logo mentions in the Theme tokens bullet above (`plum` = logo letters, `orange` = the logo's Y, and a palette change also means regenerating `public/logo.svg`), and restore this bullet's description of the SVG logo.
 
   The "L & YR" version reverts the same way, using `Logo-raised-amp.tsx.txt` and `logo-raised-amp.svg`. It predates the current palette, so its colors (e.g. `text-sage-dark`) need updating to `plum` / `orange`.
-- **Favicon:** the cat's head cropped from `public/logo.png` (the 410px square at left 425, top 215). `app/icon.png` (256px) and `app/favicon.ico` (16/32/48 PNGs) are masked to a circle with transparent corners; `app/apple-icon.png` (180px) is the full-bleed square, since iOS rounds it itself. Next.js serves them automatically, and the middleware matcher lets them through without login.
+- **Favicon:** the cat's head cropped from `public/logo.png` (the 410px square at left 425, top 215). `app/icon.png` (256px) and `app/favicon.ico` (16/32/48 PNGs) are masked to a circle with transparent corners; `app/apple-icon.png` (180px) is the full-bleed square, since iOS rounds it itself. Next.js serves them automatically, and the proxy's matcher lets them through without login.
 
 ## Deployment & services
 

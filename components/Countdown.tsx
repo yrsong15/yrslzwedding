@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
-function diff(target: number) {
-  const ms = Math.max(0, target - Date.now());
+function diff(target: number, now: number) {
+  const ms = Math.max(0, target - now);
   return {
     days: Math.floor(ms / 86_400_000),
     hours: Math.floor((ms / 3_600_000) % 24),
@@ -12,16 +12,19 @@ function diff(target: number) {
   };
 }
 
-export default function Countdown({ target }: { target: string }) {
-  const t = new Date(target).getTime();
-  // Render nothing until mounted to avoid a server/client time mismatch.
-  const [left, setLeft] = useState<ReturnType<typeof diff> | null>(null);
+// The clock as an external store, ticking once a second. The server (and the
+// first render in the browser, while hydrating) gets null, so both show dashes
+// and never disagree about the time.
+const subscribe = (tick: () => void) => {
+  const id = setInterval(tick, 1000);
+  return () => clearInterval(id);
+};
+const nowInSeconds = () => Math.floor(Date.now() / 1000);
+const noTimeOnServer = () => null;
 
-  useEffect(() => {
-    setLeft(diff(t));
-    const id = setInterval(() => setLeft(diff(t)), 1000);
-    return () => clearInterval(id);
-  }, [t]);
+export default function Countdown({ target }: { target: string }) {
+  const now = useSyncExternalStore(subscribe, nowInSeconds, noTimeOnServer);
+  const left = now === null ? null : diff(new Date(target).getTime(), now * 1000);
 
   const units = [
     ["days", left?.days],

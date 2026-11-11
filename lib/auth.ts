@@ -1,5 +1,5 @@
-// Cookie-based password gate. Uses Web Crypto so it runs in both the Edge
-// middleware and Node route handlers.
+// Cookie-based password gate, shared by proxy.ts and the route handlers.
+// Uses Web Crypto, which works in any runtime.
 
 export const SITE_COOKIE = "site_auth";
 export const ADMIN_COOKIE = "admin_auth";

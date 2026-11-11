@@ -1,5 +1,7 @@
+import AdminLoadError from "@/components/admin/AdminLoadError";
 import AdminLoginScreen from "@/components/admin/AdminLoginScreen";
 import AdminTabs from "@/components/admin/AdminTabs";
+import { StatTile } from "@/components/admin/controls";
 import GuestList from "@/components/admin/GuestList";
 import PageHeader from "@/components/PageHeader";
 import { getGuestList, isAdmin } from "@/lib/admin";
@@ -18,11 +20,7 @@ export default async function InvitesPage() {
     parties = await getGuestList();
   } catch (e) {
     console.error(e);
-    return (
-      <div className="pb-24">
-        <PageHeader title="Admin" intro="Couldn't load the guest list. Check your Supabase env vars and that schema.sql has been run." />
-      </div>
-    );
+    return <AdminLoadError what="the guest list" />;
   }
 
   // All counts cover invited guests only.
@@ -66,11 +64,7 @@ export default async function InvitesPage() {
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl border border-ink/10 bg-white/60 p-5 text-center">
-            <p className="font-serif text-4xl text-plum">{s.value}</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted">{s.label}</p>
-            {s.note && <p className="mt-1 text-xs text-muted">{s.note}</p>}
-          </div>
+          <StatTile key={s.label} {...s} />
         ))}
       </div>
 

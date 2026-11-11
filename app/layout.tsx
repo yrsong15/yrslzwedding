@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost, Noto_Serif_KR } from "next/font/google";
+import Motion from "@/components/Motion";
 import { couple, weddingDateLabel, location } from "@/lib/site";
 import "./globals.css";
 
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={`${cormorant.variable} ${jost.variable} ${notoSerifKr.variable} font-sans antialiased`}>
-        {children}
+        <Motion>{children}</Motion>
       </body>
     </html>
   );

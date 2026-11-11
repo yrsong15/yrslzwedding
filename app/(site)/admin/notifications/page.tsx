@@ -1,3 +1,4 @@
+import AdminLoadError from "@/components/admin/AdminLoadError";
 import AdminLoginScreen from "@/components/admin/AdminLoginScreen";
 import AdminTabs from "@/components/admin/AdminTabs";
 import NotificationList from "@/components/admin/NotificationList";
@@ -23,11 +24,7 @@ export default async function NotificationsPage() {
     if (who) fresh = await countNewer(seen.list_seen_at);
   } catch (e) {
     console.error(e);
-    return (
-      <div className="pb-24">
-        <PageHeader title="Admin" intro="Couldn't load the notifications. Check your Supabase env vars and that schema.sql has been run." />
-      </div>
-    );
+    return <AdminLoadError what="the notifications" />;
   }
 
   return (

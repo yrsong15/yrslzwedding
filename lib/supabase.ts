@@ -1,8 +1,6 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-export type { Guest, Party } from "./types";
-
 let client: SupabaseClient | null = null;
 
 // Server-only client using the service-role key. Never import this from a

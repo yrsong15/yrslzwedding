@@ -2,9 +2,10 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { normName } from "@/lib/names";
 import { sides } from "@/lib/site";
 import type { CardParty, Side } from "@/lib/types";
-import { Picker, Switch, normName, shortDate } from "./controls";
+import { Picker, StatTile, Switch, shortDate } from "./controls";
 import { send } from "./send";
 
 type Filters = { query: string; card: "all" | "not" | "sent"; side: "all" | Side };
@@ -60,10 +61,7 @@ export default function InviteCards({ parties }: { parties: CardParty[] }) {
     <>
       <div className="mx-auto grid max-w-md grid-cols-2 gap-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl border border-ink/10 bg-white/60 p-5 text-center">
-            <p className="font-serif text-4xl text-plum">{s.value}</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted">{s.label}</p>
-          </div>
+          <StatTile key={s.label} {...s} />
         ))}
       </div>
 

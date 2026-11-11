@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { fullName } from "@/lib/names";
 import type { Party } from "@/lib/types";
 import { couple } from "@/lib/site";
 import RsvpForm from "./RsvpForm";
@@ -51,7 +52,7 @@ export default function RsvpFlow() {
             >
               <p className="font-serif text-2xl text-plum">{p.name}</p>
               <p className="text-sm text-muted">
-                {p.guests.filter((g) => !g.is_plus_one).map((g) => `${g.first_name} ${g.last_name}`).join(", ")}
+                {p.guests.filter((g) => !g.is_plus_one).map(fullName).join(", ")}
               </p>
             </button>
           ))}

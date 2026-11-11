@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { sides } from "@/lib/site";
 import type { BellData, Side } from "@/lib/types";
 import { WhoPicker } from "./controls";
@@ -132,8 +132,7 @@ export default function NotificationBell({ initial }: { initial: BellData }) {
   const close = () => setOpen(false);
 
   return (
-    <MotionConfig reducedMotion="user">
-      <div className="relative">
+    <div className="relative">
         <button
           ref={button}
           type="button"
@@ -251,8 +250,7 @@ export default function NotificationBell({ initial }: { initial: BellData }) {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-    </MotionConfig>
+    </div>
   );
 }
 

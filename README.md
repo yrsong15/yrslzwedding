@@ -86,7 +86,7 @@ Almost all copy lives in [`lib/site.ts`](lib/site.ts):
 - names, dates, schedule, hotel
 - sights, plus restaurant, café, and bar recommendations
 - FAQs, registry links, meal options
-- the Korean text: the Home page message and each nav tab's Korean label
+- the Korean text: the Home page message, each nav tab's Korean label, and the password page
 
 Page intros (like the Registry's no-gifts note) are in each page's file under `app/(site)/`.
 

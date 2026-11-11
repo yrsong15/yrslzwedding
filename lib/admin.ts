@@ -6,7 +6,8 @@ import { ADMIN_COOKIE, ADMIN_WHO_COOKIE, verifyToken } from "./auth";
 import { cardSentMessage, invitedParty } from "./cards";
 import { EMAIL_MAX, isEmail } from "./email";
 import { arrangeTable, moveWithinTable, noRoomMessage, savedSeat, seatingTables, seatsPerTable, takesSeat } from "./seating";
-import { mealOptions, sides } from "./site";
+import { mealSchema } from "./rsvp";
+import { sides } from "./site";
 import { supabase } from "./supabase";
 import type { AdminParty, BellData, RsvpNotification, SeatingParty, Side } from "./types";
 
@@ -73,7 +74,7 @@ export type SummaryRow = {
   dietary: string | null;
   responded_at: string | null;
   invited: boolean;
-  side: "lauren" | "young_re" | null;
+  side: Side | null;
   /** The party's one email, repeated on each of its rows. */
   email: string | null;
 };
@@ -118,7 +119,6 @@ const firstName = z.string().trim().max(80);
 const lastName = z.string().trim().max(80);
 const partyName = z.string().trim().max(120);
 const side = z.enum(["lauren", "young_re"]);
-const meal = z.enum(mealOptions.map((m) => m.value) as [string, ...string[]]);
 
 const guestFields = { first_name: firstName, last_name: lastName, is_plus_one: z.boolean(), invited: z.boolean() };
 type NewGuest = { first_name: string; last_name: string; is_plus_one: boolean; invited: boolean };
@@ -143,7 +143,7 @@ export const guestUpdateSchema = z.discriminatedUnion("action", [
     id: uuid,
     attending: z.boolean().nullable(),
     attending_welcome: z.boolean().nullable(),
-    meal: meal.nullable(),
+    meal: mealSchema.nullable(),
     dietary: z.string().max(500).nullable(),
   }),
 ]);

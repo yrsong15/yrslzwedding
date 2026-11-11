@@ -18,9 +18,10 @@ import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, v
 import { CSS } from "@dnd-kit/utilities";
 import { cardSentMessage } from "@/lib/cards";
 import { isEmail } from "@/lib/email";
+import { fullName, normName } from "@/lib/names";
 import { mealOptions, sides } from "@/lib/site";
 import type { AdminGuest, AdminParty, Side } from "@/lib/types";
-import { Picker, Switch, normName, shortDate } from "./controls";
+import { Picker, Switch, shortDate } from "./controls";
 import { send } from "./send";
 
 type Draft = { first_name: string; last_name: string; is_plus_one: boolean; invited: boolean };
@@ -50,8 +51,10 @@ type Change =
 /** A guest's RSVP answers; null = no answer yet. */
 type Response = Pick<AdminGuest, "attending" | "attending_welcome" | "meal" | "dietary">;
 
+/** `items` in the order of `ids`, with any not listed at the end. */
 const inOrder = <T extends { id: string }>(items: T[], ids: string[]) => {
-  const rank = (id: string) => (ids.includes(id) ? ids.indexOf(id) : ids.length);
+  const ranks = new Map(ids.map((id, i) => [id, i]));
+  const rank = (id: string) => ranks.get(id) ?? ids.length;
   return [...items].sort((a, b) => rank(a.id) - rank(b.id));
 };
 
@@ -122,11 +125,10 @@ function requestFor(c: Change): Promise<string | null> {
 }
 
 /** Null for a plus-one who hasn't been given a name yet. */
-const guestName = (g: AdminGuest) => (g.is_plus_one && !g.first_name ? null : `${g.first_name} ${g.last_name}`);
+const guestName = (g: AdminGuest) => (g.is_plus_one && !g.first_name ? null : fullName(g));
 
 const answer = (v: boolean | null) => (v === null ? "pending" : v ? "yes" : "no");
 const fromAnswer = (s: string) => (s === "yes" ? true : s === "no" ? false : null);
-
 
 type Filters = {
   query: string;
@@ -159,7 +161,7 @@ function applyFilters(parties: AdminParty[], f: Filters) {
     .filter((p) => f.side === "all" || p.side === (f.side === "none" ? null : f.side))
     .filter(
       (p) =>
-        !q || normName(p.name).includes(q) || p.guests.some((g) => normName(`${g.first_name} ${g.last_name}`).includes(q)),
+        !q || normName(p.name).includes(q) || p.guests.some((g) => normName(fullName(g)).includes(q)),
     )
     .map((p) => ({ party: p, guests: p.guests.filter(keepGuest) }))
     .filter((r) => r.guests.length > 0 || (!filteringPeople && r.party.guests.length === 0));

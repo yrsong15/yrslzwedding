@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { EMAIL_MAX, MASK_CHAR, isEmail, suggestEmail } from "@/lib/email";
+import { namedAtRsvp } from "@/lib/names";
 import type { Guest, Party } from "@/lib/types";
 import { mealOptions, schedule } from "@/lib/site";
 
@@ -21,7 +22,7 @@ const toDraft = (g: Guest): Draft => ({
   id: g.id,
   // Someone on the list with only a first name is shown as a blank plus-one,
   // so whoever RSVPs types in both their first and last name.
-  is_plus_one: g.is_plus_one || !g.last_name.trim(),
+  is_plus_one: namedAtRsvp(g),
   first_name: g.last_name.trim() ? g.first_name : "",
   last_name: g.last_name,
   attending: g.attending,
@@ -30,7 +31,9 @@ const toDraft = (g: Guest): Draft => ({
   dietary: g.dietary ?? "",
 });
 
-const welcome = schedule[0].events[0];
+// The welcome drinks are the first event of the first day, the wedding is the second day.
+const [welcomeDay, weddingDay] = schedule;
+const welcome = welcomeDay.events[0];
 
 const hasName = (d: Draft) => Boolean(d.first_name.trim() && d.last_name.trim());
 
@@ -175,7 +178,7 @@ export default function RsvpForm({
           )}
 
           <Choice
-            label="Wedding · Saturday, July 24"
+            label={`Wedding · ${weddingDay.day}`}
             value={d.attending}
             yes="Joyfully accepts"
             no="Regretfully declines"
@@ -192,7 +195,7 @@ export default function RsvpForm({
               >
                 {party.invited_to_welcome && (
                   <Choice
-                    label={`${welcome.title} · Friday, July 23 at ${welcome.place}`}
+                    label={`${welcome.title} · ${welcomeDay.day} at ${welcome.place}`}
                     value={d.attending_welcome}
                     yes="I'll be there"
                     no="Can't make it"

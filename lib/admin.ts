@@ -183,13 +183,22 @@ const guestRow = (g: NewGuest) => ({
   invited: g.invited,
 });
 
-/** Error message if another party already uses this name (the import script keys on names). */
+const duplicateMessage = (name: string) => `There's already a party called "${name}".`;
+
+/** Postgres's code for breaking a unique index (parties_name_key). */
+const UNIQUE_VIOLATION = "23505";
+
+/**
+ * Error message if another party already uses this name (the import script
+ * keys on names). The unique index on parties.name catches the rare case of
+ * two saves at once; the callers turn that into the same message.
+ */
 async function duplicatePartyName(name: string, exceptId?: string): Promise<string | null> {
   let query = supabase().from("parties").select("id").eq("name", name).limit(1);
   if (exceptId) query = query.neq("id", exceptId);
   const { data, error } = await query;
   if (error) throw error;
-  return data.length > 0 ? `There's already a party called "${name}".` : null;
+  return data.length > 0 ? duplicateMessage(name) : null;
 }
 
 /**
@@ -211,6 +220,7 @@ export async function addParty(input: z.infer<typeof addPartySchema>): Promise<s
     .insert({ name, side: input.side, invited_to_welcome: true })
     .select("id")
     .single();
+  if (pErr?.code === UNIQUE_VIOLATION) return duplicateMessage(name);
   if (pErr) throw pErr;
   const { error: gErr } = await db.from("guests").insert(input.guests.map((g) => ({ ...guestRow(g), party_id: party.id })));
   if (gErr) {
@@ -334,6 +344,7 @@ export async function updateParty(input: z.infer<typeof partyUpdateSchema>): Pro
       const dup = await duplicatePartyName(input.name, input.id);
       if (dup) return dup;
       const { error } = await db.from("parties").update({ name: input.name }).eq("id", input.id);
+      if (error?.code === UNIQUE_VIOLATION) return duplicateMessage(input.name);
       if (error) throw error;
       return null;
     }

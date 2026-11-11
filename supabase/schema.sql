@@ -19,10 +19,13 @@ create table if not exists parties (
   -- The one email address the party gives when they RSVP (required only if
   -- someone's coming). Admin-only: guests get back just a masked hint.
   email text,
-  notes text,
   responded_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+-- Party names are unique: the import script skips names that already exist,
+-- and /admin refuses a duplicate with a message before this would.
+create unique index if not exists parties_name_key on parties (name);
 
 create table if not exists guests (
   id uuid primary key default gen_random_uuid(),
@@ -47,7 +50,6 @@ create table if not exists guests (
 );
 
 create index if not exists guests_party_id_idx on guests (party_id);
-create index if not exists guests_name_idx on guests (lower(first_name), lower(last_name));
 
 -- One row per guest RSVP change (submit, edit, or clear), for the bell in
 -- /admin. Names are snapshots, so the history survives renames and deletes.

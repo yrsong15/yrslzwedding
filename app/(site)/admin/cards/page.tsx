@@ -1,9 +1,11 @@
+import AdminLoadError from "@/components/admin/AdminLoadError";
 import AdminLoginScreen from "@/components/admin/AdminLoginScreen";
 import AdminTabs from "@/components/admin/AdminTabs";
 import InviteCards from "@/components/admin/InviteCards";
 import PageHeader from "@/components/PageHeader";
 import { getGuestList, isAdmin } from "@/lib/admin";
 import { invitedParty } from "@/lib/cards";
+import { fullName } from "@/lib/names";
 import type { AdminParty, CardParty } from "@/lib/types";
 
 export const metadata = { title: "Invite cards" };
@@ -18,11 +20,7 @@ export default async function CardsPage() {
     parties = await getGuestList();
   } catch (e) {
     console.error(e);
-    return (
-      <div className="pb-24">
-        <PageHeader title="Admin" intro="Couldn't load the guest list. Check your Supabase env vars and that schema.sql has been run." />
-      </div>
-    );
+    return <AdminLoadError what="the guest list" />;
   }
 
   // Only invited parties get a card, addressed to the people in them who are invited.
@@ -33,7 +31,7 @@ export default async function CardsPage() {
     card_sent_at: p.card_sent_at,
     guests: p.guests
       .filter((g) => g.invited)
-      .map((g) => (g.is_plus_one && !g.first_name ? null : `${g.first_name} ${g.last_name}`.trim())),
+      .map((g) => (g.is_plus_one && !g.first_name ? null : fullName(g))),
   }));
 
   return (

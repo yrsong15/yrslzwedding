@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost, Noto_Serif_KR } from "next/font/google";
+import Motion from "@/components/Motion";
 import { couple, weddingDateLabel, location } from "@/lib/site";
 import "./globals.css";
 
@@ -32,9 +33,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    // data-scroll-behavior: Next turns smooth scrolling off while it changes
+    // pages, so only in-page anchor links glide (globals.css sets it).
+    <html lang="en" data-scroll-behavior="smooth">
       <body className={`${cormorant.variable} ${jost.variable} ${notoSerifKr.variable} font-sans antialiased`}>
-        {children}
+        <Motion>{children}</Motion>
       </body>
     </html>
   );

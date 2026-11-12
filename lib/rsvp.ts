@@ -1,10 +1,11 @@
 import "server-only";
 import { z } from "zod";
 import { EMAIL_MAX, isEmail, maskEmail } from "./email";
+import { fullName, namedAtRsvp, normName } from "./names";
 import { diffParty } from "./notifications";
-import { mealOptions } from "./site";
-import { supabase, type Guest, type Party } from "./supabase";
-import type { AdminGuest, RsvpNotification } from "./types";
+import { mealValues } from "./site";
+import { supabase } from "./supabase";
+import type { AdminGuest, Guest, Party, RsvpNotification } from "./types";
 
 // Guest-facing queries list columns explicitly so the admin-only columns
 // (guests.invited, guests.seat, parties.side, parties.table_number, the position columns)
@@ -33,12 +34,9 @@ export async function getParty(id: string): Promise<Party | null> {
   return party && party.guests.length > 0 ? toPublic(party) : null;
 }
 
-// Case- and spacing-insensitive, so "young re  song" matches "Young Re Song".
-const normName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
-
 /** Find parties containing an invited guest whose full name matches what was typed. */
-export async function findPartiesByName(fullName: string): Promise<Party[]> {
-  const target = normName(fullName);
+export async function findPartiesByName(typed: string): Promise<Party[]> {
+  const target = normName(typed);
   if (!target.includes(" ")) return [];
 
   // Compare whole names instead of splitting the input at a space, since first
@@ -50,7 +48,7 @@ export async function findPartiesByName(fullName: string): Promise<Party[]> {
     .eq("invited", true);
   if (error) throw error;
 
-  const matches = (data ?? []).filter((g) => normName(`${g.first_name} ${g.last_name}`) === target);
+  const matches = (data ?? []).filter((g) => normName(fullName(g)) === target);
   const ids = [...new Set(matches.map((g) => g.party_id as string))];
   if (ids.length === 0) return [];
 
@@ -64,7 +62,8 @@ export async function findPartiesByName(fullName: string): Promise<Party[]> {
   return (parties as PartyRow[]).map(toPublic);
 }
 
-const mealValues = mealOptions.map((m) => m.value) as [string, ...string[]];
+/** A meal choice: one of the options in lib/site.ts. Shared with the admin routes. */
+export const mealSchema = z.enum(mealValues);
 
 export const rsvpSchema = z.object({
   partyId: z.string().uuid(),
@@ -74,7 +73,7 @@ export const rsvpSchema = z.object({
         id: z.string().uuid(),
         attending: z.boolean(),
         attending_welcome: z.boolean().nullable(),
-        meal: z.enum(mealValues).nullable(),
+        meal: mealSchema.nullable(),
         dietary: z.string().max(500).nullable(),
         first_name: z.string().max(80).optional(),
         last_name: z.string().max(80).optional(),
@@ -88,10 +87,6 @@ export const rsvpSchema = z.object({
 });
 
 export type RsvpInput = z.infer<typeof rsvpSchema>;
-
-// Plus-ones, and guests on the list with only a first name (the RSVP form
-// shows them as blank plus-ones), get their full names from whoever RSVPs.
-const namedAtRsvp = (g: Guest) => g.is_plus_one || !g.last_name.trim();
 
 /** Returns an error message, or null if the submission is valid for this party. */
 export function validateAgainstParty(input: RsvpInput, party: Party): string | null {
@@ -188,13 +183,13 @@ export async function recordRsvpChange(
     const changes = diffParty(before, after);
     if (changes.length === 0) return;
     const target = respondent ? normName(respondent) : "";
-    const who = before.guests.find((g) => !g.is_plus_one && target && normName(`${g.first_name} ${g.last_name}`) === target);
+    const who = before.guests.find((g) => !g.is_plus_one && target && normName(fullName(g)) === target);
     const { error } = await supabase()
       .from("rsvp_notifications")
       .insert({
         party_id: before.id,
         party_name: before.name,
-        respondent: who ? `${who.first_name} ${who.last_name}`.trim() : null,
+        respondent: who ? fullName(who) : null,
         kind,
         changes,
       });

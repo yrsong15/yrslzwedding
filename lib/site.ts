@@ -76,6 +76,9 @@ export const mealOptions = [
 
 export type Meal = (typeof mealOptions)[number]["value"];
 
+/** The meal values, in the shape z.enum takes (see mealSchema in lib/rsvp.ts). */
+export const mealValues = mealOptions.map((m) => m.value) as [Meal, ...Meal[]];
+
 export const schedule = [
   {
     day: "Friday, July 23",

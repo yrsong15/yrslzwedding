@@ -27,8 +27,11 @@
   --font-korean: var(--font-noto-serif-kr);
 }
 
-html {
-  scroll-behavior: smooth;
+/* Smooth scrolling to anchors only for people who haven't asked for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {

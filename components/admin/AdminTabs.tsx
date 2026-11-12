@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { seatingTables } from "@/lib/seating";
 
 /** The parts of /admin: cards on /admin itself, tabs on each part. */
 export const adminSections = [
@@ -15,7 +16,7 @@ export const adminSections = [
   {
     href: "/admin/seating",
     label: "Seating chart",
-    description: "Drag each party to one of the 23 tables. Everyone in a party sits together.",
+    description: `Drag each party to one of the ${seatingTables.length} tables. Everyone in a party sits together.`,
   },
 ] as const;
 

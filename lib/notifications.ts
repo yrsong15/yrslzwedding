@@ -1,14 +1,9 @@
 // RSVP notifications: what a guest's save changed, and how the admin pages
 // word it. Shared by the server (lib/rsvp.ts) and the admin components.
 
+import { fullName, namedAtRsvp } from "./names";
 import { mealOptions } from "./site";
-import type { FieldChange, Guest, GuestChange, Party, RsvpNotification } from "./types";
-
-const fullName = (g: Pick<Guest, "first_name" | "last_name">) => `${g.first_name} ${g.last_name}`.trim();
-
-// Like plus-ones, guests on the list with only a first name get their full
-// name on the RSVP form, which shows them as plus-ones.
-const isPlusOne = (g: Guest) => g.is_plus_one || !g.last_name.trim();
+import type { FieldChange, GuestChange, Party, RsvpNotification } from "./types";
 
 /**
  * What changed, person by person in the party's order, between a party before
@@ -16,7 +11,7 @@ const isPlusOne = (g: Guest) => g.is_plus_one || !g.last_name.trim();
  */
 export function diffParty(before: Party, after: Party | null): GuestChange[] {
   const now = new Map(after?.guests.map((g) => [g.id, g]));
-  const regulars = before.guests.filter((g) => !isPlusOne(g));
+  const regulars = before.guests.filter((g) => !namedAtRsvp(g));
   const host = regulars.length === 1 ? fullName(regulars[0]) : null;
   const result: GuestChange[] = [];
   for (const old of before.guests) {
@@ -36,7 +31,7 @@ export function diffParty(before: Party, after: Party | null): GuestChange[] {
     add("meal", old.meal, g.meal);
     add("dietary", old.dietary, g.dietary);
     if (changes.length === 0) continue;
-    const plusOne = isPlusOne(old);
+    const plusOne = namedAtRsvp(old);
     result.push({ guest_id: g.id, name: fullName(g) || fullName(old), plus_one: plusOne, host: plusOne ? host : null, changes });
   }
   return result;

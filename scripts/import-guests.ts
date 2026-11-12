@@ -111,7 +111,11 @@ async function main() {
       .single();
     if (pErr) throw pErr;
     const { error: gErr } = await db.from("guests").insert(p.guests.map((g) => ({ ...g, party_id: row.id })));
-    if (gErr) throw gErr;
+    if (gErr) {
+      // Don't leave an empty party behind, or a re-run would skip it as already imported.
+      await db.from("parties").delete().eq("id", row.id);
+      throw gErr;
+    }
     const invited = p.guests.filter((g) => g.invited).length;
     const side = p.side === "lauren" ? "Lauren's" : p.side === "young_re" ? "Young Re's" : "side not set";
     console.log(`add   ${name} (${p.guests.length} guest${p.guests.length === 1 ? "" : "s"}, ${invited} invited, ${side})`);

@@ -3,12 +3,20 @@
 import { sides } from "@/lib/site";
 import type { Side } from "@/lib/types";
 
-/** For matching searches: case- and spacing-insensitive. */
-export const normName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
-
 // Fixed locale and zone so the server render and hydration agree.
 export const shortDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "numeric", day: "numeric", timeZone: "America/Los_Angeles" });
+
+/** A count in a box, at the top of the admin pages. */
+export function StatTile({ label, value, note }: { label: string; value: React.ReactNode; note?: string | null }) {
+  return (
+    <div className="rounded-2xl border border-ink/10 bg-white/60 p-5 text-center">
+      <p className="font-serif text-4xl text-plum">{value}</p>
+      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted">{label}</p>
+      {note && <p className="mt-1 text-xs text-muted">{note}</p>}
+    </div>
+  );
+}
 
 export function Switch({
   checked,

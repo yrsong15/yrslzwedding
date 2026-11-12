@@ -32,6 +32,7 @@ import {
   sweetheart,
   tableName,
 } from "@/lib/seating";
+import { fullName as nameOrEmpty, normName } from "@/lib/names";
 import { sides } from "@/lib/site";
 import type { SeatingParty, Side } from "@/lib/types";
 import { send } from "./send";
@@ -70,8 +71,7 @@ const fills = ["bg-lilac", "bg-peach", "bg-orange/60"];
 const fillFor = (i: number, count: number) => fills[count > 1 && count % 2 === 1 && i === count - 1 ? 2 : i % 2];
 
 const firstName = (g: Person) => g.first_name || "Guest";
-const fullName = (g: Person) => (g.first_name ? `${g.first_name} ${g.last_name}`.trim() : "Plus-one, no name yet");
-const normName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
+const fullName = (g: Person) => nameOrEmpty(g) || "Plus-one, no name yet";
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
 const ROSTER = "roster";
@@ -186,7 +186,7 @@ export default function SeatingChart({ parties }: { parties: SeatingParty[] }) {
   const q = normName(query);
   const roster = unseated
     .filter((p) => side === "all" || p.side === side)
-    .filter((p) => !q || normName(p.name).includes(q) || p.guests.some((g) => normName(`${g.first_name} ${g.last_name}`).includes(q)));
+    .filter((p) => !q || normName(p.name).includes(q) || p.guests.some((g) => normName(nameOrEmpty(g)).includes(q)));
 
   const selectedParty = selected ? (byId.get(selected.party) ?? null) : null;
   const selectedGuest = selected?.guest ? (guestById.get(selected.guest) ?? null) : null;
@@ -365,7 +365,7 @@ export default function SeatingChart({ parties }: { parties: SeatingParty[] }) {
               </div>
             </div>
             <p className="mt-2 text-center text-xs text-muted">
-              64 × 48 ft, from the venue&apos;s blueprint. The small squares are pillars. Table placement is
+              {room.width} × {room.height} ft, from the venue&apos;s blueprint. The small squares are pillars. Table placement is
               temporary.
             </p>
           </div>

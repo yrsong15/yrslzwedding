@@ -1,3 +1,4 @@
+import AdminLoadError from "@/components/admin/AdminLoadError";
 import AdminLoginScreen from "@/components/admin/AdminLoginScreen";
 import AdminTabs from "@/components/admin/AdminTabs";
 import SeatingChart from "@/components/admin/SeatingChart";
@@ -17,11 +18,7 @@ export default async function SeatingPage() {
     parties = await getSeatingList();
   } catch (e) {
     console.error(e);
-    return (
-      <div className="pb-24">
-        <PageHeader title="Admin" intro="Couldn't load the guest list. Check your Supabase env vars and that schema.sql has been run." />
-      </div>
-    );
+    return <AdminLoadError what="the guest list" />;
   }
 
   return (

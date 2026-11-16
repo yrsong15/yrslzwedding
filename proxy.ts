@@ -19,12 +19,13 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // Everything except the password screen, its API, and static assets.
+  // Everything except the password screen, its API, the cron keepalive
+  // (which checks CRON_SECRET itself), and static assets.
   // - (?![\w-]) keeps those two exact: a later /password-reset or /api/auth-x
   //   page would be gated, not let through by its prefix.
   // - Image files skip the gate only outside /api/, so no API path gets
   //   through by ending in ".png".
   matcher: [
-    "/((?!password(?![\\w-])|api/auth(?![\\w-])|_next/static|_next/image|favicon.ico|(?!api/).*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)",
+    "/((?!password(?![\\w-])|api/auth(?![\\w-])|api/keepalive(?![\\w-])|_next/static|_next/image|favicon.ico|(?!api/).*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)",
   ],
 };

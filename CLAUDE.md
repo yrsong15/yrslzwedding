@@ -117,6 +117,7 @@ Next.js 16 App Router (Turbopack) + Tailwind v4 + Supabase, hosted on Vercel.
 
 - **Live:** https://laurenyoungre.com, a custom domain on Vercel. `www.laurenyoungre.com` redirects to it, and https://yrslzwedding.vercel.app still serves the same site (Vercel project `yrslzwedding`, deployed from GitHub `yrsong15/yrslzwedding`). Every push to `main` redeploys.
 - **Env vars in Vercel** mirror `.env.local`. Changing one in Vercel takes effect only after a redeploy. Changing `SITE_PASSWORD` or `ADMIN_PASSWORD` logs everyone out of that scope, because the cookie token is derived from the password.
+- **Supabase keepalive:** free Supabase projects pause after 7 days of low activity. Two Vercel crons (`vercel.json`) call `GET /api/keepalive` daily, which makes one count query. The route checks `Authorization: Bearer $CRON_SECRET` itself (Vercel sends it when the `CRON_SECRET` env var is set), and `proxy.ts`'s matcher lets it past the password gate. Upgrading Supabase to Pro would make this unnecessary.
 - **Don't add Vercel's Supabase integration.** It can create a new project and overwrite `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`, pointing the site at an empty database.
 - **Supabase MCP** is configured in `.mcp.json` (project-scoped, not read-only). It's useful for inspecting data and running schema SQL. Destructive statements against the real guest data need the user's go-ahead.
 

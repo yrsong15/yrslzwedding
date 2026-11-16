@@ -7,13 +7,24 @@ import Image from "next/image";
 // on the site's cream/linen without showing a box. Earlier SVG logos are
 // saved in design/logo-backups/.
 
-export default function Logo({ size, className = "" }: { size: number; className?: string }) {
+// Pass `eager` where the logo is above the fold (the nav), so it isn't
+// lazy-loaded; the footer copy stays lazy.
+export default function Logo({
+  size,
+  className = "",
+  eager = false,
+}: {
+  size: number;
+  className?: string;
+  eager?: boolean;
+}) {
   return (
     <Image
       src="/logo.png"
       alt="L R monogram — Lauren & Young Re"
       width={size}
       height={size}
+      loading={eager ? "eager" : "lazy"}
       className={`mix-blend-multiply ${className}`}
     />
   );

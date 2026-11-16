@@ -137,8 +137,20 @@ export const hotel = {
   url: "https://www.hilton.com/en/hotels/pdxpepy-canopy-portland-pearl-district/",
   // Per Hilton's listing (Oct 2026); recheck before the wedding.
   parking: "valet only (about $60 per night), no self-parking",
-  // Fill in if you reserve a room block; the Travel page shows it when set.
-  block: null as null | { bookingUrl: string; code: string; cutoff: string },
+  parkingTip: "Nearby garages and lots are usually cheaper. Apps like SpotHero show prices and let you reserve a spot. Street meters are paid with the city's Parking Kitty app.",
+  // The room block. Its link applies the group code and pre-fills the wedding
+  // weekend (Fri–Sun); guests can change the dates to any nights in the range.
+  // Set `block` to null to go back to the plain "Where to stay" card.
+  block: {
+    bookingUrl:
+      "https://www.hilton.com/en/book/reservation/rooms/?ctyhocn=PDXPEPY&arrivalDate=2027-07-23&departureDate=2027-07-25&groupCode=90O&room1NumAdults=1&cid=OM%2CWW%2CHILTONLINK%2CEN%2CDirectLink",
+    code: "90O",
+    // The discounted rate covers these nights (8 at most).
+    firstNight: "Tuesday, July 20",
+    lastNight: "Tuesday, July 27",
+    // Last day to book at the group rate; the Travel page shows it when set.
+    cutoff: "June 23, 2027" as string | null,
+  } as null | { bookingUrl: string; code: string; firstNight: string; lastNight: string; cutoff: string | null },
 };
 
 export const thingsToDo = [

@@ -40,7 +40,7 @@ Guests enter the shared guest password once, and then can browse every page. Eac
   They can come back later to see or change their answers.
 - **Schedule**: the weekend's events.
 - **Things to Do**: sights around Portland, plus the couple's favorite restaurants, cafés, and bars, with map links.
-- **Travel & Lodging**: getting to Portland and where to stay.
+- **Travel & Lodging**: getting to Portland, and the hotel room block (a discounted rate at the Canopy by Hilton, with a booking link) and where to park.
 - **FAQs**: dress code, parking, and other common questions.
 - **Registry**: no gifts, please; instead, a few charities to donate to.
 
@@ -83,7 +83,7 @@ npm run import-guests -- guests.csv
 
 Almost all copy lives in [`lib/site.ts`](lib/site.ts):
 
-- names, dates, schedule, hotel
+- names, dates, schedule, hotel (including the room block's booking link, dates, and book-by deadline, and the parking note)
 - sights, plus restaurant, café, and bar recommendations
 - FAQs, registry links, meal options
 - the Korean text: the Home page message, each nav tab's Korean label, and the password page

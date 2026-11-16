@@ -15,7 +15,7 @@ const transport = [
   },
   {
     title: "Rental car",
-    body: `All the major rental companies operate at PDX. Handy for day trips to the Gorge or the coast. Just note that downtown parking can be pricey. Parking at the ${hotel.shortName} is ${hotel.parking}.`,
+    body: `All the major rental companies operate at PDX. Handy for day trips to the Gorge or the coast. Just note that downtown parking can be pricey. Parking at the ${hotel.shortName} is ${hotel.parking}. ${hotel.parkingTip}`,
   },
 ];
 
@@ -32,16 +32,28 @@ export default function TravelPage() {
           <h2 className="mt-3 font-serif text-4xl">{hotel.name}</h2>
           <p className="mt-1 text-cream/80">{hotel.neighborhood}, Portland</p>
           <p className="text-sm text-cream/60">{hotel.address}</p>
-          <p className="mt-1 text-sm text-cream/60">Parking: {hotel.parking}</p>
+          <p className="mx-auto mt-1 max-w-md text-sm text-cream/60">
+            Parking: {hotel.parking}. {hotel.parkingTip}
+          </p>
           {hotel.block ? (
-            <p className="mx-auto mt-6 max-w-lg leading-relaxed text-cream/90">
-              We&apos;ve reserved a block of rooms at a discounted rate. Use code{" "}
-              <span className="rounded bg-cream/15 px-2 py-0.5 font-mono tracking-wider">{hotel.block.code}</span>{" "}
-              when booking. Please reserve by {hotel.block.cutoff}.
-            </p>
+            <div className="mx-auto mt-6 max-w-lg space-y-3 leading-relaxed text-cream/90">
+              <p>
+                We&apos;ve reserved a block of rooms at a discounted rate, just two blocks down from the venue.
+                The rate is available for any nights from {hotel.block.firstNight} through{" "}
+                {hotel.block.lastNight}, so you can come early or stay on after the wedding.
+              </p>
+              <p>
+                The button below applies our group rate for you. Just change the dates to match your stay.
+                {hotel.block.cutoff && <> Please reserve by {hotel.block.cutoff}.</>}
+              </p>
+              <p className="text-sm text-cream/70">
+                Booking by phone? Mention group code{" "}
+                <span className="rounded bg-cream/15 px-2 py-0.5 font-mono tracking-wider">{hotel.block.code}</span>
+              </p>
+            </div>
           ) : (
             <p className="mx-auto mt-6 max-w-lg leading-relaxed text-cream/90">
-              Our recommended hotel is just a few blocks down NW 9th Avenue from the venue, and an easy walk
+              Our recommended hotel is just two blocks down from the venue, and an easy walk
               to Powell&apos;s, coffee shops, and restaurants in the Pearl.
             </p>
           )}

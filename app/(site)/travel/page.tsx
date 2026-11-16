@@ -32,9 +32,6 @@ export default function TravelPage() {
           <h2 className="mt-3 font-serif text-4xl">{hotel.name}</h2>
           <p className="mt-1 text-cream/80">{hotel.neighborhood}, Portland</p>
           <p className="text-sm text-cream/60">{hotel.address}</p>
-          <p className="mx-auto mt-1 max-w-md text-sm text-cream/60">
-            Parking: {hotel.parking}. {hotel.parkingTip}
-          </p>
           {hotel.block ? (
             <div className="mx-auto mt-6 max-w-lg space-y-3 leading-relaxed text-cream/90">
               <p>

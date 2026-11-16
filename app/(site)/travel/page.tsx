@@ -37,8 +37,11 @@ export default function TravelPage() {
               <p>
                 We&apos;ve reserved a block of rooms at a discounted rate, just two blocks down from the venue.
                 The rate is available for any nights from {hotel.block.firstNight} through{" "}
-                {hotel.block.lastNight}, so you can come early or stay on after the wedding. With welcome drinks
-                on Friday night and the wedding on Saturday night, we recommend booking at least July 23–25.
+                {hotel.block.lastNight}, so you can come early or stay on after the wedding.
+              </p>
+              <p>
+                With welcome drinks on Friday night and the wedding on Saturday night, we recommend booking at
+                least <span className="font-medium text-orange">July 23–25</span>.
               </p>
               <p>
                 The button below applies our group rate for you. Just change the dates to match your stay.

@@ -9,7 +9,7 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 - [ ] **FAQs.** Venue parking still says "details coming soon". Review the dress code and the other answers too.
 - [ ] **Things to do: Sights.** The five Sights picks were researched placeholders. Review them and swap in your own favorites. The restaurant, café, and bar lists are already yours.
 - [x] **Korean text check.** Have a native-speaking family member review the Home page message (로렌과 영래가 함께 인생의 새로운 출발을 하려 합니다) and the nav tab labels, including the 영래 spelling.
-- [ ] **Hotel room block (optional).** If you reserve one, fill in `hotel.block` in `lib/site.ts`; the Travel page switches to showing the code and deadline.
+- [x] **Hotel room block.** Reserved at the Canopy (group code `90O`, discounted for nights July 20–27, 2027, up to 8; book by June 23, 2027). It's `hotel.block` in `lib/site.ts`; the Travel page's button opens Hilton's booking page with the code applied and July 23–25 pre-filled.
 - [ ] **Look over every page** on your phone and on a laptop.
 
 ## Guest list & database
@@ -40,7 +40,7 @@ Check items off by changing `[ ]` to `[x]`. Most copy lives in [`lib/site.ts`](l
 - [ ] **Switch the Supabase MCP to read-only** (or disconnect it) once real RSVPs arrive.
 - [ ] **(Optional) Auto-close RSVPs** after March 1, 2027, with a "please email us" message.
 - [ ] **Recheck time-sensitive details** closer to July 2027:
-  - hotel valet price
+  - hotel valet price, and that the room block link still applies the group rate
   - Wayfinder Beer and Backwoods Brewing hours
   - the Multnomah Falls permit rules
   - that every recommended restaurant, café, and bar is still open (Javelina already moved once)

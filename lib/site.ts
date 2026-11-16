@@ -246,8 +246,9 @@ export const foodAndDrink: { title: string; places: Place[]; footnote?: string }
       {
         name: "Food carts",
         blurb:
-          "Portland's food cart pods are legendary: clusters of carts serving food from all over the world, all in one spot. Try the Central Eastside, which is also where Friday's welcome drinks are.",
-        multiple: true,
+          "Portland's food cart pods are legendary: clusters of carts serving food from all over the world, all in one spot. We love Cartside near the Moda Center (home of the Portland Trail Blazers). The Central Eastside neighborhood also has a lot of options.",
+        // The map link goes to Cartside, the one pod we name.
+        map: "Cartside Food Carts, 1825 N Williams Ave, Portland, OR 97227",
       },
     ],
   },

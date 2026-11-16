@@ -46,11 +46,6 @@ export default function TravelPage() {
                 The button below applies our group rate for you. Just change the dates to match your stay.
                 {hotel.block.cutoff && <> Please reserve by {hotel.block.cutoff}.</>}
               </p>
-              <p className="text-sm text-cream/70">
-                Booking by phone? Mention group code{" "}
-                <span className="rounded bg-cream/15 px-2 py-0.5 font-mono tracking-wider">{hotel.block.code}</span>{" "}
-                <span className="text-xs text-cream/60">({hotel.block.codeSpelled})</span>
-              </p>
             </div>
           ) : (
             <p className="mx-auto mt-6 max-w-lg leading-relaxed text-cream/90">
@@ -66,6 +61,13 @@ export default function TravelPage() {
           >
             {hotel.block ? "Book your room" : "Visit hotel website"} ↗
           </a>
+          {hotel.block && (
+            <p className="mt-5 text-sm text-cream/70">
+              Booking by phone? Mention group code{" "}
+              <span className="rounded bg-cream/15 px-2 py-0.5 font-mono tracking-wider">{hotel.block.code}</span>{" "}
+              <span className="text-xs text-cream/60">({hotel.block.codeSpelled})</span>
+            </p>
+          )}
         </div>
       </FadeIn>
 

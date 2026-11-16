@@ -49,7 +49,7 @@ export default function ThingsToDoPage() {
               <li key={p.name}>
                 <FadeIn delay={(i % 3) * 0.08} className="flex h-full flex-col border-t border-lavender/40 pt-4">
                   <h3 className="font-serif text-2xl text-plum">{p.name}</h3>
-                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-lavender">{p.tag}</p>
+                  {p.tag && <p className="mt-1 text-xs uppercase tracking-[0.2em] text-lavender">{p.tag}</p>}
                   <p className="mt-3 flex-1 leading-relaxed text-muted">{p.blurb}</p>
                   {"map" in p ? (
                     <a

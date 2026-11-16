@@ -178,11 +178,11 @@ export const thingsToDo = [
     url: "https://pittockmansion.org/",
   },
   {
-    title: "Food carts & breweries",
-    area: "Citywide",
+    title: "Tom McCall Waterfront Park",
+    area: "Downtown",
     blurb:
-      "Portland's food cart pods and craft breweries are legendary. Try the Central Eastside, which is also where Friday's welcome drinks are.",
-    url: "https://www.travelportland.com/",
+      "A riverside path along the Willamette, great for a walk or run across the bridges. On weekends, the Portland Saturday Market sets up at its north end.",
+    url: "https://www.portland.gov/parks/tom-mccall-waterfront-park",
   },
   {
     title: "Multnomah Falls & the Columbia River Gorge",
@@ -196,7 +196,7 @@ export const thingsToDo = [
 // Food & drink recommendations on the Things to Do page. Give single-location
 // places a `map` query (name + address); places with several locations get
 // `multiple: true` instead and no map link.
-type Place = { name: string; tag: string; blurb: string } & ({ map: string } | { multiple: true });
+type Place = { name: string; tag?: string; blurb: string } & ({ map: string } | { multiple: true });
 
 export const foodAndDrink: { title: string; places: Place[]; footnote?: string }[] = [
   {
@@ -242,6 +242,13 @@ export const foodAndDrink: { title: string; places: Place[]; footnote?: string }
           "A little out of the way, but well worth the trip. Portland has a huge Southeast Asian community.",
         // Has several locations; we specifically recommend the original on 82nd.
         map: "Pho Van, 1919 SE 82nd Ave, Portland, OR 97216",
+      },
+      {
+        name: "Food carts",
+        blurb:
+          "Portland's food cart pods are legendary: clusters of carts serving food from all over the world, all in one spot. We love Cartside near the Moda Center (home of the Portland Trail Blazers). The Central Eastside neighborhood also has a lot of options.",
+        // The map link goes to Cartside, the one pod we name.
+        map: "Cartside Food Carts, 1825 N Williams Ave, Portland, OR 97227",
       },
     ],
   },

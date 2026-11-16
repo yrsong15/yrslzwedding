@@ -48,7 +48,8 @@ export default function TravelPage() {
               </p>
               <p className="text-sm text-cream/70">
                 Booking by phone? Mention group code{" "}
-                <span className="rounded bg-cream/15 px-2 py-0.5 font-mono tracking-wider">{hotel.block.code}</span>
+                <span className="rounded bg-cream/15 px-2 py-0.5 font-mono tracking-wider">{hotel.block.code}</span>{" "}
+                <span className="text-xs text-cream/60">({hotel.block.codeSpelled})</span>
               </p>
             </div>
           ) : (

@@ -19,7 +19,7 @@ Next.js 16 App Router (Turbopack) + Tailwind v4 + Supabase, hosted on Vercel.
 - **Most content lives in `lib/site.ts`:**
   - names, dates, the Korean Home message (`koreanMessage`). The couple is always written Lauren first: "Lauren & Young Re", and in Korean 로렌과 영래가 (the particles change with the order, so don't just swap the names).
   - nav labels (each with its Korean `ko` label)
-  - schedule, hotel. `hotel.block` is the room block at the Canopy: the booking link (it carries `groupCode=90O` and pre-fills July 23–25, 2027), the code, the nights the rate covers (July 20–27), and the book-by `cutoff` (June 23, 2027; `null` hides the line). The Travel page words its card from it; setting `block` to `null` brings back the plain "Where to stay" card. `hotel.parkingTip` points guests to cheaper nearby lots, since the hotel is valet only.
+  - schedule, hotel. `hotel.block` is the room block at the Canopy: the booking link (it carries `groupCode=90O` and pre-fills July 23–25, 2027), the code (and `codeSpelled`, "nine, zero, letter O", shown next to it since 0 and O look alike), the nights the rate covers (July 20–27), and the book-by `cutoff` (June 23, 2027; `null` hides the line). The Travel page words its card from it; setting `block` to `null` brings back the plain "Where to stay" card. `hotel.parkingTip` points guests to cheaper nearby lots, since the hotel is valet only.
   - Sights (`thingsToDo`) and food & drink (`foodAndDrink`)
   - FAQs, charities, and meal options
   - the `/password` page's Korean (`passwordPageKo`). That page is bilingual for guests who read only English or only Korean, so every line has a Korean pair except the date. `PasswordForm` shows Korean only when given `ko`, so the admin login stays English only.

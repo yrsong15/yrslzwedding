@@ -145,12 +145,14 @@ export const hotel = {
     bookingUrl:
       "https://www.hilton.com/en/book/reservation/rooms/?ctyhocn=PDXPEPY&arrivalDate=2027-07-23&departureDate=2027-07-25&groupCode=90O&room1NumAdults=1&cid=OM%2CWW%2CHILTONLINK%2CEN%2CDirectLink",
     code: "90O",
+    // How to read the code aloud, since 0 and O look alike.
+    codeSpelled: "nine, zero, letter O",
     // The discounted rate covers these nights (8 at most).
     firstNight: "Tuesday, July 20",
     lastNight: "Tuesday, July 27",
     // Last day to book at the group rate; the Travel page shows it when set.
     cutoff: "June 23, 2027" as string | null,
-  } as null | { bookingUrl: string; code: string; firstNight: string; lastNight: string; cutoff: string | null },
+  } as null | { bookingUrl: string; code: string; codeSpelled: string; firstNight: string; lastNight: string; cutoff: string | null },
 };
 
 export const thingsToDo = [

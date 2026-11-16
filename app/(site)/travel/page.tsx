@@ -33,11 +33,11 @@ export default function TravelPage() {
           <p className="mt-1 text-cream/80">{hotel.neighborhood}, Portland</p>
           <p className="text-sm text-cream/60">{hotel.address}</p>
           {hotel.block ? (
-            <div className="mx-auto mt-6 max-w-lg space-y-3 leading-relaxed text-cream/90">
+            <div className="mx-auto mt-6 max-w-lg space-y-3 leading-relaxed text-pretty text-cream/90">
               <p>
                 We&apos;ve reserved a block of rooms at a discounted rate, just two blocks down from the venue.
                 The rate is available for any nights from {hotel.block.firstNight} through{" "}
-                {hotel.block.lastNight}, so you can come early or stay on after the wedding.
+                {hotel.block.lastNight}, so you can come early or stay on after the&nbsp;wedding.
               </p>
               <p>
                 With welcome drinks on Friday night and the wedding on Saturday night, we recommend booking at
